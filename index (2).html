@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COP4813 - Hello World</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #f4f6f8;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: #0b3d2e;
+      color: #ffffff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      margin: 0.5rem 0 0;
+      font-size: 1rem;
+      color: #cfe9dc;
+    }
+
+    nav {
+      background-color: #0f5132;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 0.75rem 0;
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    section {
+      background-color: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    section h2 {
+      margin-top: 0;
+      color: #0b3d2e;
+      border-bottom: 2px solid #0f5132;
+      padding-bottom: 0.5rem;
+    }
+
+    figure {
+      margin: 1rem 0;
+      text-align: center;
+    }
+
+    figure img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    figcaption {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+
+    a.external-link {
+      color: #0f5132;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: #0b3d2e;
+      color: #ffffff;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Hello, World!</h1>
+    <p>My first GitHub Pages site for COP4813</p>
+  </header>
+
+  <nav>
+    <a href="#about">About</a>
+    <a href="#class-info">Class Info</a>
+    <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <main>
+
+    <section id="about">
+      <h2>About This Page</h2>
+      <p>
+        This is a simple "Hello World" web page built as Assignment 1 for
+        COP4813 (Web Application Development). It was created with a plain
+        text/HTML editor, tracked with Git, and published using GitHub Pages
+        directly from the repository.
+      </p>
+
+      <figure>
+        <img src="hero-image.jpg" alt="A terminal displaying Hello World, with a holographic globe and binary code in the background">
+        <figcaption>A sample image included to satisfy the assignment requirement.</figcaption>
+      </figure>
+    </section>
+
+    <section id="class-info">
+      <h2>Class Information</h2>
+
+      <figure>
+        <img src="github-logo.svg" alt="GitHub Invertocat logo" width="120">
+        <figcaption>Published and version-controlled with GitHub.</figcaption>
+      </figure>
+
+      <p>
+        This page was built for <strong>COP4813 - Web Application
+        Development</strong> at Daytona State College. The assignment
+        required setting up a GitHub account, creating a local Git
+        repository, pushing an <code>index.html</code> file to a
+        <code>COP4813</code> repo, and enabling GitHub Pages to publish
+        the site publicly.
+      </p>
+      <p>
+        Want to see how GitHub Pages works under the hood? Check out
+        <a class="external-link" href="https://pages.github.com/" target="_blank" rel="noopener">
+          GitHub Pages documentation
+        </a>.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Created by Damyr JeanFrancois &mdash; COP4813, Fall 2026</p>
+  </footer>
+
+</body>
+</html>
