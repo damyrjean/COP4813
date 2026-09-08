@@ -1,0 +1,131 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #222;
+  background-color: #fafafa;
+  line-height: 1.6;
+}
+
+header {
+  background-color: #1b3a57;
+  color: #fff;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.tagline {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+}
+
+nav {
+  background-color: #274c70;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+nav ul li {
+  position: relative;
+}
+
+nav ul li a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  text-decoration: none;
+}
+
+nav ul li a:hover,
+nav ul li a:focus {
+  background-color: #3a6690;
+  text-decoration: underline;
+}
+
+nav ul li > span,
+nav ul li {
+  color: #fff;
+}
+
+nav ul ul {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #274c70;
+  min-width: 200px;
+  flex-direction: column;
+  z-index: 10;
+}
+
+nav ul li:hover > ul,
+nav ul li:focus-within > ul {
+  display: flex;
+}
+
+nav > ul > li {
+  padding: 0.75rem 1rem;
+  cursor: default;
+}
+
+main {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+section {
+  margin-bottom: 2rem;
+}
+
+h2 {
+  border-bottom: 2px solid #1b3a57;
+  padding-bottom: 0.25rem;
+}
+
+figure {
+  margin: 1rem 0;
+}
+
+figure img {
+  border-radius: 8px;
+  display: block;
+}
+
+figcaption {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.25rem;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #1b3a57;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+a {
+  color: #1b3a57;
+}
+
+a:focus,
+button:focus {
+  outline: 3px solid #ffb400;
+  outline-offset: 2px;
+}
