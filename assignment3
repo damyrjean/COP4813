@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Form - Assignment 3</title>
+<style>
+  :root{
+    --navy:#1c2b4a;
+    --navy-light:#2e4573;
+    --slate:#5b6b8c;
+    --paper:#f6f7fb;
+    --line:#d8dde8;
+    --error:#b3261e;
+    --ok:#1e6b3a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--paper);
+    color:#1a1a1a;
+    padding: 40px 16px;
+  }
+  h1{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.6rem;
+    color: var(--navy);
+    margin: 0 0 6px;
+  }
+  .subtitle{
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--slate);
+    margin: 0 0 28px;
+    font-size: 0.95rem;
+  }
+  .card{
+    max-width: 560px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 32px;
+  }
+  fieldset{
+    border: none;
+    padding: 0;
+    margin: 0 0 22px;
+  }
+  legend{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    color: var(--navy-light);
+    margin-bottom: 10px;
+    padding: 0;
+  }
+  label{
+    display:block;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.85rem;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .row{
+    display:flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .row > div{ flex: 1; min-width: 140px; }
+  .field{ margin-bottom: 14px; }
+  input, select, textarea{
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.95rem;
+    background: #fff;
+  }
+  input:focus, select:focus, textarea:focus{
+    outline: 2px solid var(--navy-light);
+    outline-offset: 1px;
+  }
+  textarea{ min-height: 90px; resize: vertical; }
+  .err{
+    color: var(--error);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.78rem;
+    margin-top: 3px;
+    min-height: 1em;
+  }
+  button{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.95rem;
+    padding: 11px 22px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary{
+    background: var(--navy);
+    color: #fff;
+  }
+  .btn-primary:hover{ background: var(--navy-light); }
+  .btn-secondary{
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid var(--navy);
+    margin-right: 10px;
+  }
+  .btn-secondary:hover{ background: var(--paper); }
+  .actions{ margin-top: 6px; }
+  #confirmSection{ display:none; }
+  #confirmSection dt{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.78rem;
+    color: var(--slate);
+    margin-top: 12px;
+  }
+  #confirmSection dd{
+    margin: 2px 0 0;
+    font-size: 1rem;
+  }
+  .note{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.85rem;
+    color: var(--ok);
+    background: #eaf5ee;
+    border: 1px solid #cfe9d8;
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  #successMsg{ display:none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Contact Form</h1>
+  <p class="subtitle">Fill in your information below. All fields are required.</p>
+
+  <form id="contactForm" novalidate>
+
+    <fieldset>
+      <legend>Name</legend>
+      <div class="row">
+        <div>
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName">
+          <div class="err" id="err-firstName"></div>
+        </div>
+        <div>
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName">
+          <div class="err" id="err-lastName"></div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Mailing Address</legend>
+      <div class="field">
+        <label for="address">Street Address</label>
+        <input type="text" id="address" name="address" placeholder="123 Main St">
+        <div class="err" id="err-address"></div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="city">City</label>
+          <input type="text" id="city" name="city">
+          <div class="err" id="err-city"></div>
+        </div>
+        <div>
+          <label for="state">State</label>
+          <select id="state" name="state">
+            <option value="">Select</option>
+            <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+            <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+            <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+            <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+            <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+            <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+            <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+            <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+            <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+            <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+            <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+            <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+            <option>WI</option><option>WY</option>
+          </select>
+          <div class="err" id="err-state"></div>
+        </div>
+        <div>
+          <label for="zip">ZIP Code</label>
+          <input type="text" id="zip" name="zip" maxlength="10" placeholder="32114">
+          <div class="err" id="err-zip"></div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Contact Details</legend>
+      <div class="field">
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" name="phone" placeholder="(000)000-0000" maxlength="13">
+        <div class="err" id="err-phone"></div>
+      </div>
+      <div class="field">
+        <label for="email">Email Address</label>
+        <input type="text" id="email" name="email" placeholder="name@domain.com">
+        <div class="err" id="err-email"></div>
+      </div>
+      <div class="field">
+        <label for="birthdate">Birth Date</label>
+        <input type="date" id="birthdate" name="birthdate">
+        <div class="err" id="err-birthdate"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Message</legend>
+      <div class="field">
+        <label for="message">Your Message</label>
+        <textarea id="message" name="message"></textarea>
+        <div class="err" id="err-message"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Confirm You're Human</legend>
+      <div class="field">
+        <label id="captchaLabel" for="captcha">Security Question</label>
+        <input type="text" id="captcha" name="captcha">
+        <div class="err" id="err-captcha"></div>
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit" class="btn-primary">Review Information</button>
+    </div>
+  </form>
+
+  <div id="confirmSection">
+    <div class="note">Please review your information before sending.</div>
+    <dl id="confirmList"></dl>
+    <div class="actions" style="margin-top:20px;">
+      <button type="button" class="btn-secondary" id="editBtn">Edit</button>
+      <button type="button" class="btn-primary" id="sendBtn">Send Message</button>
+    </div>
+  </div>
+
+  <div id="successMsg">
+    <p class="note">Your email client should now be open with your message ready to send. If it didn't open, check that your browser allows mailto links.</p>
+    <button type="button" class="btn-secondary" id="startOverBtn">Start Over</button>
+  </div>
+</div>
+
+<script>
+const RECIPIENT_EMAIL = "damyr_jean-francois@daytonstate.edu";
+
+const form = document.getElementById('contactForm');
+const confirmSection = document.getElementById('confirmSection');
+const successMsg = document.getElementById('successMsg');
+const confirmList = document.getElementById('confirmList');
+
+let captchaAnswer = 0;
+function newCaptcha(){
+  const a = Math.floor(Math.random()*8)+1;
+  const b = Math.floor(Math.random()*8)+1;
+  captchaAnswer = a + b;
+  document.getElementById('captchaLabel').textContent = `What is ${a} + ${b}?`;
+}
+newCaptcha();
+
+// phone input mask: (000)000-0000
+document.getElementById('phone').addEventListener('input', function(e){
+  let digits = e.target.value.replace(/\D/g,'').slice(0,10);
+  let out = '';
+  if(digits.length > 0) out += '(' + digits.slice(0,3);
+  if(digits.length >= 3) out += ')' + digits.slice(3,6);
+  if(digits.length >= 6) out += '-' + digits.slice(6,10);
+  e.target.value = out;
+});
+
+function setError(id, msg){
+  document.getElementById('err-'+id).textContent = msg;
+}
+function clearErrors(){
+  document.querySelectorAll('.err').forEach(el => el.textContent = '');
+}
+
+function validate(){
+  clearErrors();
+  let valid = true;
+  const val = id => document.getElementById(id).value.trim();
+
+  if(!val('firstName')){ setError('firstName','First name is required.'); valid = false; }
+  if(!val('lastName')){ setError('lastName','Last name is required.'); valid = false; }
+
+  if(!val('address')){ setError('address','Street address is required.'); valid = false; }
+  if(!val('city')){ setError('city','City is required.'); valid = false; }
+  if(!val('state')){ setError('state','Please select a state.'); valid = false; }
+  const zip = val('zip');
+  if(!/^\d{5}(-\d{4})?$/.test(zip)){ setError('zip','Enter a valid ZIP code (e.g. 32114 or 32114-1234).'); valid = false; }
+
+  const phoneDigits = val('phone').replace(/\D/g,'');
+  if(phoneDigits.length !== 10){ setError('phone','Enter a full 10-digit phone number.'); valid = false; }
+
+  const email = val('email');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setError('email','Enter a valid email address.'); valid = false; }
+
+  const bdVal = val('birthdate');
+  if(!bdVal){
+    setError('birthdate','Birth date is required.'); valid = false;
+  } else {
+    const bd = new Date(bdVal + 'T00:00:00');
+    const today = new Date();
+    if(bd > today){ setError('birthdate','Birth date cannot be in the future.'); valid = false; }
+    else if(bd.getFullYear() < 1900){ setError('birthdate','Enter a valid birth date.'); valid = false; }
+  }
+
+  if(!val('message')){ setError('message','Please enter a message.'); valid = false; }
+
+  const capVal = val('captcha');
+  if(String(captchaAnswer) !== capVal){ setError('captcha','Incorrect answer, please try again.'); valid = false; newCaptcha(); document.getElementById('captcha').value=''; }
+
+  return valid;
+}
+
+function formatPhone(digits){
+  return `(${digits.slice(0,3)})${digits.slice(3,6)}-${digits.slice(6,10)}`;
+}
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  if(!validate()) return;
+
+  const data = {
+    'First Name': document.getElementById('firstName').value.trim(),
+    'Last Name': document.getElementById('lastName').value.trim(),
+    'Address': document.getElementById('address').value.trim(),
+    'City': document.getElementById('city').value.trim(),
+    'State': document.getElementById('state').value,
+    'ZIP': document.getElementById('zip').value.trim(),
+    'Phone': document.getElementById('phone').value.trim(),
+    'Email': document.getElementById('email').value.trim(),
+    'Birth Date': document.getElementById('birthdate').value,
+    'Message': document.getElementById('message').value.trim()
+  };
+
+  confirmList.innerHTML = '';
+  for(const [k,v] of Object.entries(data)){
+    const dt = document.createElement('dt');
+    dt.textContent = k;
+    const dd = document.createElement('dd');
+    dd.textContent = v;
+    confirmList.appendChild(dt);
+    confirmList.appendChild(dd);
+  }
+
+  form.style.display = 'none';
+  confirmSection.style.display = 'block';
+  confirmSection.dataset.payload = JSON.stringify(data);
+});
+
+document.getElementById('editBtn').addEventListener('click', function(){
+  confirmSection.style.display = 'none';
+  form.style.display = 'block';
+});
+
+document.getElementById('sendBtn').addEventListener('click', function(){
+  const data = JSON.parse(confirmSection.dataset.payload);
+  const subject = encodeURIComponent(`Contact Form Submission - ${data['First Name']} ${data['Last Name']}`);
+  const bodyLines = Object.entries(data).map(([k,v]) => `${k}: ${v}`);
+  const body = encodeURIComponent(bodyLines.join('\n'));
+  window.location.href = `mailto:${RECIPIENT_EMAIL}?subject=${subject}&body=${body}`;
+
+  confirmSection.style.display = 'none';
+  successMsg.style.display = 'block';
+});
+
+document.getElementById('startOverBtn').addEventListener('click', function(){
+  form.reset();
+  newCaptcha();
+  successMsg.style.display = 'none';
+  form.style.display = 'block';
+});
+</script>
+
+</body>
+</html>
