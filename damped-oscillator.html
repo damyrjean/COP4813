@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Damped Oscillator Calculator</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 0 15px; color: #222; }
+  h1 { font-size: 24px; }
+  .eq { background: #f2f2f2; padding: 8px 12px; font-family: monospace; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 15px 0; }
+  label { display: block; font-size: 14px; }
+  input { width: 100%; padding: 6px; box-sizing: border-box; }
+  button { padding: 8px 18px; font-size: 15px; cursor: pointer; }
+  #error { color: #b00020; margin: 10px 0; }
+  #results { margin: 15px 0; line-height: 1.6; }
+  #chart { width: 100%; height: 400px; margin-top: 15px; }
+  .tablewrap { max-height: 250px; overflow-y: auto; border: 1px solid #ccc; margin-top: 15px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { padding: 4px 10px; text-align: right; border-bottom: 1px solid #eee; }
+  th { position: sticky; top: 0; background: #eee; }
+</style>
+</head>
+<body>
+
+<h1>Damped Oscillator Calculator</h1>
+<p>Models a spring-mass system (or RLC circuit) that loses energy over time.</p>
+<p class="eq">y(t) = A &middot; e<sup>-b&middot;t</sup> &middot; cos(&omega;&middot;t + &phi;)</p>
+<p>y = displacement, t = time (seconds), A = starting amplitude, b = damping constant (1/s),
+   &omega; = angular frequency (rad/s), &phi; = phase (rad).</p>
+
+<div class="grid">
+  <label>A (amplitude)<input type="number" id="A" value="10" step="any"></label>
+  <label>b (damping, 1/s)<input type="number" id="b" value="0.3" step="any"></label>
+  <label>&omega; (rad/s)<input type="number" id="w" value="4" step="any"></label>
+  <label>&phi; (phase, rad)<input type="number" id="phi" value="0" step="any"></label>
+  <label>t start (s)<input type="number" id="tmin" value="0" step="any"></label>
+  <label>t end (s)<input type="number" id="tmax" value="20" step="any"></label>
+  <label>t step (s)<input type="number" id="dt" value="0.05" step="any"></label>
+</div>
+
+<button id="calc">Calculate and Plot</button>
+<div id="error"></div>
+<div id="results"></div>
+<div id="chart"></div>
+<div class="tablewrap"><table id="table"></table></div>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+function y(t, A, b, w, phi) {
+  return A * Math.exp(-b * t) * Math.cos(w * t + phi);
+}
+
+function num(id) {
+  return parseFloat(document.getElementById(id).value);
+}
+
+function calculate() {
+  var A = num('A'), b = num('b'), w = num('w'), phi = num('phi');
+  var tmin = num('tmin'), tmax = num('tmax'), dt = num('dt');
+  var err = document.getElementById('error');
+  err.textContent = '';
+
+  if ([A, b, w, phi, tmin, tmax, dt].some(isNaN)) { err.textContent = 'Please fill in every field with a number.'; return; }
+  if (tmax <= tmin) { err.textContent = 't end must be greater than t start.'; return; }
+  if (dt <= 0) { err.textContent = 't step must be greater than 0.'; return; }
+  if ((tmax - tmin) / dt > 20000) { err.textContent = 'Too many points. Use a larger step.'; return; }
+
+  // build data
+  var data = [], maxY = -Infinity, minY = Infinity, tMax = 0, tMin = 0;
+  for (var t = tmin; t <= tmax + 1e-9; t += dt) {
+    var v = y(t, A, b, w, phi);
+    data.push([+t.toFixed(6), +v.toFixed(6)]);
+    if (v > maxY) { maxY = v; tMax = t; }
+    if (v < minY) { minY = v; tMin = t; }
+  }
+
+  // exact zero crossings: cos(w*t + phi) = 0  ->  t = (pi/2 + n*pi - phi) / w
+  var zeros = [];
+  if (w !== 0) {
+    var nStart = Math.floor((w * tmin + phi - Math.PI / 2) / Math.PI) - 1;
+    var nEnd = Math.ceil((w * tmax + phi - Math.PI / 2) / Math.PI) + 1;
+    for (var n = nStart; n <= nEnd; n++) {
+      var tz = (Math.PI / 2 + n * Math.PI - phi) / w;
+      if (tz >= tmin && tz <= tmax) zeros.push(tz);
+    }
+    zeros.sort(function (a, c) { return a - c; });
+  }
+
+  var out = '';
+  out += '<b>Points calculated:</b> ' + data.length + '<br>';
+  out += '<b>Max y:</b> ' + maxY.toFixed(4) + ' at t = ' + tMax.toFixed(3) + ' s<br>';
+  out += '<b>Min y:</b> ' + minY.toFixed(4) + ' at t = ' + tMin.toFixed(3) + ' s<br>';
+  if (w !== 0) out += '<b>Period:</b> ' + (2 * Math.PI / Math.abs(w)).toFixed(4) + ' s<br>';
+  if (b > 0 && A !== 0) out += '<b>Time for amplitude to fall to 5% of A:</b> ' + (Math.log(20) / b).toFixed(3) + ' s<br>';
+  out += '<b>Zero crossings in range (' + zeros.length + '):</b> ';
+  out += zeros.length ? zeros.slice(0, 12).map(function (z) { return z.toFixed(3); }).join(', ') + (zeros.length > 12 ? ', ...' : '') : 'none';
+  document.getElementById('results').innerHTML = out;
+
+  // table
+  var html = '<tr><th>t (s)</th><th>y</th></tr>';
+  data.forEach(function (p) { html += '<tr><td>' + p[0] + '</td><td>' + p[1] + '</td></tr>'; });
+  document.getElementById('table').innerHTML = html;
+
+  // envelope lines (+/- A e^(-bt))
+  var upper = [], lower = [];
+  data.forEach(function (p) {
+    var e = A * Math.exp(-b * p[0]);
+    upper.push([p[0], +e.toFixed(6)]);
+    lower.push([p[0], +(-e).toFixed(6)]);
+  });
+
+  Highcharts.chart('chart', {
+    chart: { type: 'line', zoomType: 'x' },
+    title: { text: 'Damped Oscillation: y = A e^(-bt) cos(\u03C9t + \u03C6)' },
+    xAxis: { title: { text: 'Time t (s)' } },
+    yAxis: { title: { text: 'Displacement y' } },
+    tooltip: { valueDecimals: 4 },
+    plotOptions: { series: { marker: { enabled: false } } },
+    series: [
+      { name: 'y(t)', data: data, color: '#2b6cb0', lineWidth: 2 },
+      { name: 'Envelope +', data: upper, color: '#999', dashStyle: 'Dash', lineWidth: 1 },
+      { name: 'Envelope -', data: lower, color: '#999', dashStyle: 'Dash', lineWidth: 1 }
+    ],
+    credits: { enabled: false }
+  });
+}
+
+document.getElementById('calc').addEventListener('click', calculate);
+calculate();
+</script>
+</body>
+</html>
