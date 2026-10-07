@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignment 6 - JSON</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f9;
+      color: #222;
+      margin: 0;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #1f3b63;
+      margin-bottom: 5px;
+    }
+    #source {
+      text-align: center;
+      color: #666;
+      margin-top: 0;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 20px auto;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    th, td {
+      padding: 10px 16px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background: #1f3b63;
+      color: #fff;
+    }
+    tr:nth-child(even) {
+      background: #eef2f7;
+    }
+    td.name {
+      font-weight: bold;
+      text-align: left;
+    }
+    #error {
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="title">Loading...</h1>
+  <p id="source"></p>
+
+  <table id="planetTable">
+    <thead>
+      <tr>
+        <th>Order</th>
+        <th>Planet</th>
+        <th>Type</th>
+        <th>Diameter (km)</th>
+        <th>Distance from Sun (million km)</th>
+        <th>Orbit (Earth days)</th>
+        <th>Moons</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <p id="error"></p>
+
+  <script>
+    // Read the external JSON file and build the table from it
+    $.getJSON("planets.json", function (data) {
+      $("#title").text(data.title);
+      $("#source").text("Source: " + data.source);
+
+      $.each(data.planets, function (i, planet) {
+        var row = "<tr>" +
+          "<td>" + planet.order + "</td>" +
+          "<td class='name'>" + planet.name + "</td>" +
+          "<td>" + planet.type + "</td>" +
+          "<td>" + planet.diameterKm.toLocaleString() + "</td>" +
+          "<td>" + planet.distanceMillionKm.toLocaleString() + "</td>" +
+          "<td>" + planet.orbitDays.toLocaleString() + "</td>" +
+          "<td>" + planet.moons + "</td>" +
+          "</tr>";
+        $("#planetTable tbody").append(row);
+      });
+    }).fail(function () {
+      $("#title").text("Planets of Our Solar System");
+      $("#error").text("Could not load planets.json. Make sure it is in the same folder on the server.");
+    });
+  </script>
+
+</body>
+</html>
