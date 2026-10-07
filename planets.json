@@ -1,0 +1,14 @@
+{
+  "title": "Planets of Our Solar System",
+  "source": "NASA Planetary Fact Sheet",
+  "planets": [
+    { "name": "Mercury", "order": 1, "type": "Rocky", "diameterKm": 4879, "distanceMillionKm": 57.9, "orbitDays": 88, "moons": 0 },
+    { "name": "Venus", "order": 2, "type": "Rocky", "diameterKm": 12104, "distanceMillionKm": 108.2, "orbitDays": 224.7, "moons": 0 },
+    { "name": "Earth", "order": 3, "type": "Rocky", "diameterKm": 12756, "distanceMillionKm": 149.6, "orbitDays": 365.2, "moons": 1 },
+    { "name": "Mars", "order": 4, "type": "Rocky", "diameterKm": 6792, "distanceMillionKm": 228.0, "orbitDays": 687, "moons": 2 },
+    { "name": "Jupiter", "order": 5, "type": "Gas Giant", "diameterKm": 142984, "distanceMillionKm": 778.5, "orbitDays": 4331, "moons": 95 },
+    { "name": "Saturn", "order": 6, "type": "Gas Giant", "diameterKm": 120536, "distanceMillionKm": 1432.0, "orbitDays": 10747, "moons": 146 },
+    { "name": "Uranus", "order": 7, "type": "Ice Giant", "diameterKm": 51118, "distanceMillionKm": 2867.0, "orbitDays": 30589, "moons": 28 },
+    { "name": "Neptune", "order": 8, "type": "Ice Giant", "diameterKm": 49528, "distanceMillionKm": 4515.0, "orbitDays": 59800, "moons": 16 }
+  ]
+}
