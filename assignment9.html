@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Assignment 9 - Animation</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; }
+  canvas { border: 3px solid #333; background: #f4f4f4; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h2>Assignment 9 - Bouncing Ball</h2>
+<p>Click the ball to make it explode.</p>
+<canvas id="myCanvas" width="500" height="400"></canvas>
+
+<script>
+var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
+
+// Ball settings
+var x = 50;
+var y = 50;
+var dx = 4;      // same x and y step = 45 degree diagonal
+var dy = 4;
+var radius = 20;
+var color = "#0095DD";
+
+// Explosion settings
+var exploding = false;
+var particles = [];
+
+// Draw the ball
+function drawBall() {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.closePath();
+}
+
+// Make a random color
+function randomColor() {
+  var r = Math.floor(Math.random() * 256);
+  var g = Math.floor(Math.random() * 256);
+  var b = Math.floor(Math.random() * 256);
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+// Create explosion particles at the ball's location
+function explode() {
+  exploding = true;
+  particles = [];
+  for (var i = 0; i < 40; i++) {
+    var angle = Math.random() * Math.PI * 2;
+    var speed = Math.random() * 6 + 1;
+    particles.push({
+      x: x,
+      y: y,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      size: Math.random() * 5 + 2,
+      life: 50
+    });
+  }
+}
+
+// Draw and move explosion particles
+function drawParticles() {
+  for (var i = 0; i < particles.length; i++) {
+    var p = particles[i];
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = p.life / 50;   // fade out
+    ctx.fill();
+    ctx.closePath();
+    ctx.globalAlpha = 1;
+
+    p.x += p.dx;
+    p.y += p.dy;
+    p.life--;
+  }
+
+  // Remove dead particles
+  particles = particles.filter(function (p) { return p.life > 0; });
+
+  // When explosion is done, bring the ball back
+  if (particles.length === 0) {
+    respawn();
+  }
+}
+
+// Put the ball back in the middle with a new color and random direction
+function respawn() {
+  exploding = false;
+  x = canvas.width / 2;
+  y = canvas.height / 2;
+  color = randomColor();
+
+  var angle = Math.random() * Math.PI * 2;
+  var speed = 5;
+  dx = Math.cos(angle) * speed;
+  dy = Math.sin(angle) * speed;
+}
+
+// Main animation loop (runs on a timer)
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (exploding) {
+    drawParticles();
+    return;
+  }
+
+  drawBall();
+
+  // Bounce off left and right walls
+  if (x + dx > canvas.width - radius || x + dx < radius) {
+    dx = -dx;
+  }
+  // Bounce off top and bottom walls
+  if (y + dy > canvas.height - radius || y + dy < radius) {
+    dy = -dy;
+  }
+
+  x += dx;
+  y += dy;
+}
+
+// Mouse click: check if the click hit the ball
+canvas.addEventListener("click", function (event) {
+  if (exploding) return;
+
+  var rect = canvas.getBoundingClientRect();
+  var mouseX = event.clientX - rect.left;
+  var mouseY = event.clientY - rect.top;
+
+  // Distance from click to ball center
+  var distX = mouseX - x;
+  var distY = mouseY - y;
+  var distance = Math.sqrt(distX * distX + distY * distY);
+
+  if (distance < radius) {
+    explode();
+  }
+});
+
+// Timer-based animation: redraw every 20 milliseconds
+setInterval(draw, 20);
+</script>
+
+</body>
+</html>
