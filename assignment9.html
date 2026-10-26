@@ -133,15 +133,19 @@ canvas.addEventListener("click", function (event) {
   if (exploding) return;
 
   var rect = canvas.getBoundingClientRect();
-  var mouseX = event.clientX - rect.left;
-  var mouseY = event.clientY - rect.top;
+  // Scale in case the page CSS resizes the canvas
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var mouseX = (event.clientX - rect.left) * scaleX;
+  var mouseY = (event.clientY - rect.top) * scaleY;
 
   // Distance from click to ball center
   var distX = mouseX - x;
   var distY = mouseY - y;
   var distance = Math.sqrt(distX * distX + distY * distY);
 
-  if (distance < radius) {
+  // A little extra room so a moving ball is easier to hit
+  if (distance < radius + 15) {
     explode();
   }
 });
