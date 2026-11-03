@@ -72,12 +72,12 @@ nav ul ul {
   z-index: 10;
 }
 
-nav ul li:hover > ul,
-nav ul li:focus-within > ul {
+nav:not(.site-nav) ul li:hover > ul,
+nav:not(.site-nav) ul li:focus-within > ul {
   display: flex;
 }
 
-nav > ul > li {
+nav:not(.site-nav) > ul > li {
   padding: 0.75rem 1rem;
   cursor: default;
 }
@@ -104,6 +104,8 @@ figure {
 figure img {
   border-radius: 8px;
   display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 figcaption {
@@ -128,4 +130,166 @@ a:focus,
 button:focus {
   outline: 3px solid #ffb400;
   outline-offset: 2px;
+}
+
+/* ---------- Main menu: same markup on phone and desktop ---------- */
+
+.site-nav button {
+  font: inherit;
+  color: #fff;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.site-nav ul {
+  display: block;
+}
+
+.site-nav a,
+.site-nav button {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.site-nav .submenu-toggle::after {
+  content: "\25BE";
+  float: right;
+  margin-left: 0.5rem;
+}
+
+.site-nav .open > .submenu-toggle::after {
+  content: "\25B4";
+}
+
+.site-nav a:hover,
+.site-nav a:focus,
+.site-nav button:hover,
+.site-nav button:focus {
+  background-color: #3a6690;
+}
+
+.site-nav a[aria-current="page"] {
+  font-weight: bold;
+}
+
+/* Keep the focus ring inside the bar so it isn't clipped */
+.site-nav a:focus,
+.site-nav button:focus {
+  outline-offset: -3px;
+}
+
+.site-nav .menu-toggle {
+  display: none;
+}
+
+/* No focus ring after a tap or mouse click, keyboard users still get it */
+.site-nav a:focus:not(:focus-visible),
+.site-nav button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.menu-icon {
+  display: inline-block;
+  width: 1.25rem;
+  height: 0.875rem;
+  margin-right: 0.625rem;
+  border-top: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  background: linear-gradient(#fff, #fff) center / 100% 2px no-repeat;
+}
+
+/* Phone and small tablet: hamburger menu with tap-to-open sections */
+@media (max-width: 767px) {
+  .js .site-nav .menu-toggle {
+    display: block;
+  }
+
+  .js .menu {
+    display: none;
+  }
+
+  .js .menu-open .menu {
+    display: block;
+  }
+
+  .site-nav .menu > li {
+    border-top: 1px solid #3a6690;
+  }
+
+  .site-nav .submenu {
+    position: static;
+    min-width: 0;
+    background-color: #1b3a57;
+  }
+
+  .js .site-nav .submenu {
+    display: none;
+  }
+
+  .js .site-nav .open > .submenu {
+    display: block;
+  }
+
+  .site-nav .submenu a {
+    padding-left: 2rem;
+  }
+}
+
+/* Desktop: horizontal bar with dropdowns */
+@media (min-width: 768px) {
+  .site-nav .menu {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .site-nav .menu a,
+  .site-nav .submenu-toggle {
+    width: auto;
+  }
+
+  .site-nav .submenu a {
+    width: 100%;
+  }
+
+  .site-nav .submenu {
+    display: none;
+    width: 320px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .site-nav .open > .submenu,
+  html:not(.js) .site-nav .has-submenu:focus-within > .submenu {
+    display: block;
+  }
+
+  .site-nav .has-submenu:last-child > .submenu {
+    left: auto;
+    right: 0;
+  }
+}
+
+/* Open on hover only on devices that really hover, so touch screens use tap */
+@media (min-width: 768px) and (hover: hover) {
+  .site-nav .has-submenu:hover > .submenu {
+    display: block;
+  }
+}
+
+/* Lighthouse report page */
+.score-list {
+  padding-left: 1.25rem;
+}
+
+.capture {
+  border: 1px solid #ccc;
+}
+
+figure img.capture {
+  border-radius: 0;
 }

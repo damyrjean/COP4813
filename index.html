@@ -6,7 +6,10 @@
   <meta name="description" content="Personal portfolio site of Damyr Jean, IT student and web developer, built for COP4813.">
   <meta name="author" content="Damyr Jean">
   <title>Damyr Jean - Portfolio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b3a57'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='20' font-weight='700' text-anchor='middle' fill='%23fff'%3EDJ%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="menu.js" defer></script>
 </head>
 <body>
   <header>
@@ -14,30 +17,36 @@
     <p class="tagline">IT Student &amp; Web Developer</p>
   </header>
 
-  <nav aria-label="Main menu">
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li>My Classes
-        <ul>
+  <nav class="site-nav" aria-label="Main menu">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-menu">
+      <span class="menu-icon" aria-hidden="true"></span>Menu
+    </button>
+    <ul class="menu" id="main-menu">
+      <li><a href="index.html" aria-current="page">Home</a></li>
+      <li class="has-submenu">
+        <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="menu-classes">My Classes</button>
+        <ul class="submenu" id="menu-classes">
           <li><a href="https://github.com/damyrjean" target="_blank" rel="noopener">GitHub Profile</a></li>
         </ul>
       </li>
-      <li>My Assignments
-        <ul>
+      <li class="has-submenu">
+        <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="menu-assignments">My Assignments</button>
+        <ul class="submenu" id="menu-assignments">
           <li><a href="https://damyrjean.github.io/COP4813" target="_blank" rel="noopener">Assignment 1 - Hello World</a></li>
           <li><a href="index.html">Assignment 2 - This Site</a></li>
           <li><a href="assignment3.html">Assignment 3 - Forms</a></li>
-          </li><a href="damped-oscillator.html">Assignment 4 - Damped Oscillator Calculator</a></li>
-          </li><a href="spirograph.html">Assignment 5 - Spirograph</a></li>
-          <a href="assignment6.html">Assignment 6 - JSON</a>
-          <a href="assignment7.html">Assignment 7 - Drag and Drop Cards</a>
-          <a href="assignment9.html">Assignment 9 - Animation</a>
-          <a href="assignment10.html">Assignment 10 - Mobile Ready</a>
+          <li><a href="damped-oscillator.html">Assignment 4 - Damped Oscillator Calculator</a></li>
+          <li><a href="spirograph.html">Assignment 5 - Spirograph</a></li>
+          <li><a href="assignment6.html">Assignment 6 - JSON</a></li>
+          <li><a href="assignment7.html">Assignment 7 - Drag and Drop Cards</a></li>
+          <li><a href="assignment9.html">Assignment 9 - Animation</a></li>
+          <li><a href="assignment10.html">Assignment 10 - Mobile Lighthouse Report</a></li>
         </ul>
       </li>
       <li><a href="resume.html">Resume / About</a></li>
-      <li>Programming Sites
-        <ul>
+      <li class="has-submenu">
+        <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="menu-sites">Programming Sites</button>
+        <ul class="submenu" id="menu-sites">
           <li><a href="https://www.w3schools.com/" target="_blank" rel="noopener">W3Schools</a></li>
           <li><a href="https://validator.w3.org/" target="_blank" rel="noopener">W3C Validator</a></li>
         </ul>
@@ -58,8 +67,8 @@
     <section>
       <h2>Who I Am</h2>
       <figure>
-        <img src="profile.jpg" alt="Photo representing Damyr Jean" width="220" height="220">
-        <figcaption>Damyr Jean</figcaption>
+        <img src="home-image-960.jpg" srcset="home-image-480.jpg 480w, home-image-960.jpg 960w" sizes="(max-width: 832px) calc(100vw - 2rem), 800px" alt="Code window showing Hello World in front of a digital globe" fetchpriority="high" width="960" height="540">
+        <figcaption>Hello World, where this site started.</figcaption>
       </figure>
       <p>
         I'm an IT student finishing my B.S. in an IT-related field, expected to
