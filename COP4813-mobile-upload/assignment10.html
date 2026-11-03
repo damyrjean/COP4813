@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lighthouse mobile audit results and analysis for the home page of Damyr Jean's COP4813 site.">
+  <meta name="author" content="Damyr Jean">
+  <title>Damyr Jean - Assignment 10</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b3a57'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='20' font-weight='700' text-anchor='middle' fill='%23fff'%3EDJ%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="menu.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Damyr Jean</h1>
+    <p class="tagline">Assignment 10 - Mobile Lighthouse Report</p>
+  </header>
+
+  <nav class="site-nav" aria-label="Main menu">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-menu">
+      <span class="menu-icon" aria-hidden="true"></span>Menu
+    </button>
+    <ul class="menu" id="main-menu">
+      <li><a href="index.html">Home</a></li>
+      <li class="has-submenu">
+        <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="menu-classes">My Classes</button>
+        <ul class="submenu" id="menu-classes">
+          <li><a href="https://github.com/damyrjean" target="_blank" rel="noopener">GitHub Profile</a></li>
+        </ul>
+      </li>
+      <li class="has-submenu">
+        <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="menu-assignments">My Assignments</button>
+        <ul class="submenu" id="menu-assignments">
+          <li><a href="https://damyrjean.github.io/COP4813" target="_blank" rel="noopener">Assignment 1 - Hello World</a></li>
+          <li><a href="index.html">Assignment 2 - This Site</a></li>
+          <li><a href="assignment3.html">Assignment 3 - Forms</a></li>
+          <li><a href="damped-oscillator.html">Assignment 4 - Damped Oscillator Calculator</a></li>
+          <li><a href="spirograph.html">Assignment 5 - Spirograph</a></li>
+          <li><a href="assignment6.html">Assignment 6 - JSON</a></li>
+          <li><a href="assignment7.html">Assignment 7 - Drag and Drop Cards</a></li>
+          <li><a href="assignment9.html">Assignment 9 - Animation</a></li>
+          <li><a href="assignment10.html" aria-current="page">Assignment 10 - Mobile Lighthouse Report</a></li>
+        </ul>
+      </li>
+      <li><a href="resume.html">Resume / About</a></li>
+      <li class="has-submenu">
+        <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="menu-sites">Programming Sites</button>
+        <ul class="submenu" id="menu-sites">
+          <li><a href="https://www.w3schools.com/" target="_blank" rel="noopener">W3Schools</a></li>
+          <li><a href="https://validator.w3.org/" target="_blank" rel="noopener">W3C Validator</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <main>
+    <section>
+      <h2>Mobile Version</h2>
+      <p>
+        I used option 3 from the assignment: one home page that works on both
+        phone and desktop. Under 768 pixels wide, the menu collapses behind a Menu
+        button and each section opens with a tap. On desktop it is a normal
+        dropdown bar. Both have the same menu choices.
+      </p>
+      <p>
+        A tap on a touch screen fires the same click event as a mouse click, so
+        one click handler in menu.js runs the menu for touch, mouse, and keyboard.
+        Hover only opens dropdowns inside a (hover: hover) media query, so touch
+        screens don't get stuck on it. Menu items are at least 48 pixels tall so
+        they are easy to tap, and the home page image now resizes to fit the screen.
+      </p>
+      <figure>
+        <img class="capture" src="lighthouse/phone-closed.jpg" alt="Home page on a phone with the menu closed" width="585" height="996" loading="lazy">
+        <figcaption>Phone view with the menu closed.</figcaption>
+      </figure>
+      <figure>
+        <img class="capture" src="lighthouse/phone-open.jpg" alt="Home page on a phone with the My Assignments section open" width="585" height="996" loading="lazy">
+        <figcaption>Phone view after tapping Menu and My Assignments.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <h2>Overall Scores</h2>
+      <figure>
+        <img class="capture" src="lighthouse/01-overall-scores.png" alt="Lighthouse scores: Performance 100, Accessibility 100, Best Practices 100, SEO 100, Agentic Browsing 2 of 2" width="1000" height="94">
+      </figure>
+      <ul class="score-list">
+        <li>Performance: 100 (was 97 before the changes)</li>
+        <li>Accessibility: 100 (was 100)</li>
+        <li>Best Practices: 100 (was 96)</li>
+        <li>SEO: 100 (was 100)</li>
+      </ul>
+      <p>
+        Test setup: Lighthouse 13.6.0, navigation mode, mobile, run against these
+        site files on a local test server before upload. Scores change a little
+        from run to run. <a href="lighthouse/lighthouse-report.html">Open the full Lighthouse report</a>.
+      </p>
+      <p>
+        Google shut down its separate Mobile Friendly Test in 2023, so Lighthouse
+        is the tool used for this audit.
+      </p>
+    </section>
+
+    <section>
+      <h2>Performance</h2>
+      <p>
+        First Contentful Paint 0.8 s, Largest Contentful Paint 1.4 s, Total Blocking
+        Time 0 ms, Cumulative Layout Shift 0, Speed Index 0.8 s. The score is 100, but
+        Lighthouse still lists these issues:
+      </p>
+      <ul>
+        <li>Improve image delivery (about 61 KiB). The phone gets the 960 pixel image for a space about 380 pixels wide. A middle size image in the srcset would fix this.</li>
+        <li>Render blocking requests (about 130 ms). The browser waits on style.css before drawing the page. Inlining the critical CSS would help, but the file is under 2 KiB so it isn't worth much.</li>
+        <li>Efficient cache lifetimes (about 68 KiB). Files were cached for 10 minutes, the same as GitHub Pages. GitHub sets that, not me, so I can't change it on this host.</li>
+        <li>Network dependency tree. This lists index.html loading style.css. The chain is only two files and took 56 ms, so there is nothing to fix.</li>
+      </ul>
+      <figure>
+        <img class="capture" src="lighthouse/02-performance.png" alt="Lighthouse Performance section with metrics and the list of insights" width="840" height="3055" loading="lazy">
+      </figure>
+    </section>
+
+    <section>
+      <h2>Accessibility</h2>
+      <p>
+        No failed audits. Lighthouse also lists 10 items to check by hand because it
+        can't test them automatically. A score of 100 doesn't prove a page is fully
+        accessible. The old menu also scored 100, even though its sections were plain
+        text that a keyboard couldn't open and the photo was broken. The new menu uses
+        real buttons with aria-expanded, which fixes the keyboard problem.
+      </p>
+      <figure>
+        <img class="capture" src="lighthouse/03-accessibility.png" alt="Lighthouse Accessibility section" width="840" height="1061" loading="lazy">
+      </figure>
+    </section>
+
+    <section>
+      <h2>Best Practices</h2>
+      <p>
+        The first run scored 96 because the site had no favicon, which logged a 404
+        error in the console. I added an icon to the page and the score went to 100.
+        No issues are left in this section.
+      </p>
+      <figure>
+        <img class="capture" src="lighthouse/04-best-practices.png" alt="Lighthouse Best Practices section" width="840" height="870" loading="lazy">
+      </figure>
+    </section>
+
+    <section>
+      <h2>SEO</h2>
+      <p>
+        No failed audits. The page has a title, a meta description, a viewport tag,
+        and descriptive links. Lighthouse lists 1 extra item to check by hand.
+      </p>
+      <figure>
+        <img class="capture" src="lighthouse/05-seo.png" alt="Lighthouse SEO section" width="840" height="703" loading="lazy">
+      </figure>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Damyr Jean. Built for COP4813.</p>
+  </footer>
+</body>
+</html>
