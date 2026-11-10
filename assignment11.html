@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BSIT Quick Advisor – Damyr Jean-Francois</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --panel: #fff; --ink: #1d2433; --muted: #6b7385; --line: #dde1e8;
+    --blue: #1f5fbf; --green: #1e8a4c; --green-bg: #e6f5ec; --amber: #b26a00; --amber-bg: #fff4e0;
+    --red: #c0392b; --red-bg: #fdecea; --gray-bg: #eef0f3; --plan: #6a3fb5; --plan-bg: #f1ebfb;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; }
+  header { background: #12305e; color: #fff; padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  header h1 { margin: 0; font-size: 20px; }
+  header .sub { font-size: 12px; opacity: .85; }
+  header a { color: #cfe0ff; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+  button:hover { border-color: var(--blue); }
+  button.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  header button { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.3); }
+  .progress { padding: 10px 20px; background: #fff; border-bottom: 1px solid var(--line); display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+  .bar { width: 220px; height: 10px; background: var(--gray-bg); border-radius: 5px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
+  .bar > div { height: 100%; background: var(--green); }
+  .filters { display: flex; gap: 6px; }
+  .filters button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr); gap: 16px; padding: 16px 20px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .panel h2 { margin: 0 0 8px; font-size: 16px; }
+  #planPanel { position: sticky; top: 12px; align-self: start; max-height: calc(100vh - 24px); overflow: auto; }
+  @media (max-width: 900px) { #planPanel { position: static; max-height: none; } }
+  .group { margin-bottom: 14px; }
+  .group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 8px; }
+  .group-head h3 { margin: 0; font-size: 14px; }
+  .group-head .tag { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: var(--gray-bg); color: var(--muted); white-space: nowrap; }
+  .group-head .tag.ok { background: var(--green-bg); color: var(--green); }
+  .group-note { font-size: 12px; background: var(--amber-bg); color: #6b4300; border-left: 3px solid var(--amber); padding: 5px 8px; margin: -2px 0 8px; border-radius: 4px; }
+  .option-label { font-size: 11px; color: var(--muted); margin: 6px 0 3px; text-transform: uppercase; letter-spacing: .04em; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+  .card { border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 8px; padding: 8px 10px; background: #fff; cursor: grab; position: relative; }
+  .card.available { border-left-color: var(--blue); }
+  .card.completed { border-left-color: var(--green); background: var(--green-bg); }
+  .card.planned { border-left-color: var(--plan); background: var(--plan-bg); }
+  .card.locked { border-left-color: #aab; background: #fafbfc; }
+  .card.notneeded { border-left-color: #ccc; background: var(--gray-bg); opacity: .6; cursor: not-allowed; }
+  .card.notneeded .title { text-decoration: line-through; }
+  .card .top { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+  .card .code { font-weight: 700; }
+  .card .credits { font-size: 11px; color: var(--muted); }
+  .card .title { font-size: 13px; margin: 2px 0 4px; }
+  .card .status { font-size: 11px; font-weight: 600; }
+  .status.available { color: var(--blue); } .status.completed { color: var(--green); } .status.planned { color: var(--plan); }
+  .status.locked { color: var(--muted); } .status.notneeded { color: var(--muted); }
+  .prereq { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .pr-code { padding: 0 3px; border-radius: 3px; background: var(--gray-bg); }
+  .pr-code.met { background: var(--green-bg); color: var(--green); }
+  .pr-op { font-weight: 700; color: var(--ink); font-size: 10px; }
+  .card .actions { display: flex; gap: 6px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+  .card .actions label { font-size: 12px; display: flex; gap: 4px; align-items: center; cursor: pointer; }
+  .card .actions select, .card .actions button { font-size: 11px; padding: 2px 6px; }
+  .note-btn { margin-left: auto; }
+  .note-btn.has { border-color: var(--amber); color: var(--amber); }
+  .notes { margin-top: 6px; border-top: 1px dashed var(--line); padding-top: 6px; font-size: 12px; }
+  .note { padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; background: var(--amber-bg); display: flex; gap: 6px; justify-content: space-between; }
+  .note.student { background: #e9f1ff; }
+  .note small { color: var(--muted); display: block; }
+  .note button { border: none; background: none; color: var(--red); padding: 0 2px; }
+  .notes textarea { width: 100%; font: inherit; font-size: 12px; min-height: 44px; border: 1px solid var(--line); border-radius: 4px; padding: 4px; }
+  .dropzone { min-height: 56px; border: 2px dashed var(--line); border-radius: 8px; padding: 6px; margin-bottom: 10px; transition: background .15s, border-color .15s; }
+  .dropzone.over { border-color: var(--blue); background: #eef4ff; }
+  .dropzone.bad { border-color: var(--red); background: var(--red-bg); }
+  .zone-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
+  .zone-head span { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .chip { display: inline-flex; gap: 6px; align-items: center; padding: 3px 8px; margin: 2px; border-radius: 12px; background: var(--plan-bg); border: 1px solid #d8c9f2; font-size: 12px; cursor: grab; }
+  .chip.done { background: var(--green-bg); border-color: #b9e2c8; }
+  .chip.warn { background: var(--red-bg); border-color: #f2b8b1; }
+  .chip button { border: none; background: none; padding: 0; color: var(--muted); font-size: 13px; line-height: 1; }
+  .empty { color: var(--muted); font-size: 12px; padding: 6px; }
+  #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 9px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90vw; }
+  #toast.show { opacity: 1; }
+  #toast.err { background: var(--red); }
+  dialog { border: none; border-radius: 10px; width: min(800px, 94vw); padding: 0; }
+  dialog .dh { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  dialog pre { margin: 0; padding: 12px 14px; max-height: 65vh; overflow: auto; font-size: 12px; background: #fafbfc; }
+  .help { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+  .disclaimer { font-size: 11px; color: var(--muted); padding: 0 20px 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="progTitle">Quick Advisor</h1>
+    <div class="sub" id="progSub"></div>
+  </div>
+  <div class="toolbar">
+    <button onclick="location.href='index.html'">← Home</button>
+    <button id="btnAddSem">+ Add semester</button>
+    <button id="btnJson">View / export JSON</button>
+    <button id="btnReset">Reset</button>
+  </div>
+</header>
+
+<div class="progress">
+  <div>Total credits done: <b id="credDone">0</b> &nbsp;|&nbsp; planned: <b id="credPlan">0</b></div>
+  <div>Upper-division program credits: <b id="upperDone">0</b> / <span id="upperReq">48</span> <span class="bar"><div id="upperBar" style="width:0"></div></span></div>
+  <div class="filters" id="filters">
+    <button data-f="all" class="active">All</button>
+    <button data-f="available">Can take now</button>
+    <button data-f="locked">Locked</button>
+    <button data-f="done">Done / planned</button>
+  </div>
+</div>
+
+<main>
+  <section class="panel">
+    <h2>Program requirements</h2>
+    <p class="help">Check "Taken" or drag a course into <b>Completed</b>. Blue = you can take it now. Drag blue courses into a semester to build your plan. Click 📝 to read or add notes.</p>
+    <div id="requirements"></div>
+  </section>
+
+  <section class="panel" id="planPanel">
+    <h2>My plan</h2>
+    <p class="help">Drop courses here. A course can only go in a semester after its prerequisites are completed or planned in an earlier semester. Drag a chip back to the left to remove it.</p>
+    <div id="planArea"></div>
+  </section>
+</main>
+
+<p class="disclaimer" id="disclaimer"></p>
+
+<dialog id="jsonDlg">
+  <div class="dh"><b>Program data + your record (JSON)</b>
+    <div><button id="btnDownload" class="primary">Download .json</button> <button id="btnClose">Close</button></div>
+  </div>
+  <pre id="jsonOut"></pre>
+</dialog>
+
+<div id="toast"></div>
+
+<!-- ===================== JSON DATA ===================== -->
+<!-- All program, course, prerequisite, choice-group and note data lives here.
+     Prerequisite format: a course code string, {"and":[...]} or {"or":[...]} (can be nested). -->
+<script type="application/json" id="programData">
+{
+  "program": {
+    "name": "Information Technology (BSIT), B.S.",
+    "school": "Daytona State College",
+    "catalog": "2026-2027",
+    "programCode": "633400",
+    "catalogUrl": "https://daytonastate.smartcatalogiq.com/en/2026-2027/college-catalog/program-guides/bs-degree/information-technology-bsit-b-s-degree",
+    "upperDivisionCreditsRequired": 48,
+    "disclaimer": "Course list from the DSC 2026-2027 BSIT program guide. Course-level prerequisites are modeled for this assignment; check catalog course descriptions before registering."
+  },
+
+  "groups": [
+    { "id": "admit", "title": "Admission Prerequisites", "type": "all",
+      "courses": ["ENC1101", "MAC1105"],
+      "note": "Both required with a C or better before admission." },
+
+    { "id": "trig", "title": "Mathematics – Trigonometry", "type": "all", "courses": ["MAC1114"] },
+
+    { "id": "stats", "title": "Statistics Requirement", "type": "chooseOne",
+      "options": [["STA2023"], ["EGN3443"]],
+      "note": "Select ONE of these two courses. You do not need both. EGN3443 is recommended." },
+
+    { "id": "calc", "title": "Calculus Requirement", "type": "chooseOne",
+      "options": [["EGN2045"], ["MAC2311C"]],
+      "note": "Select ONE of these two courses. You do not need both." },
+
+    { "id": "prog1", "title": "Foundational Programming", "type": "all", "courses": ["COP1000"] },
+
+    { "id": "prog2", "title": "Programming Course", "type": "chooseOne",
+      "options": [["COP2220"], ["COP2360"], ["COP2800"]],
+      "note": "Select ONE programming language course (C, C#, or Java). Once you take one, the others are not needed." },
+
+    { "id": "digital", "title": "Digital Technology Requirement", "type": "chooseOne",
+      "options": [["CET3116"], ["CET1112C"]],
+      "note": "Select ONE. CET3116 is recommended." },
+
+    { "id": "discrete", "title": "Discrete Mathematics Requirement", "type": "chooseOne",
+      "options": [["COT3100"], ["MAD2104"]],
+      "note": "Select ONE. COT3100 is recommended." },
+
+    { "id": "elec", "title": "Electrical Fundamentals Requirement", "type": "chooseOne",
+      "options": [["EET3086"], ["EET3085", "EET1021C"], ["EET1011C", "EET1021C"]],
+      "note": "Complete ONE option. EET3086 alone is recommended. The other two options each need two courses." },
+
+    { "id": "core", "title": "BSIT Program Specific Courses", "type": "all",
+      "courses": ["COP3530", "COP4610", "COP4708", "COP4813", "CNT3104", "CNT4007", "CNT4703",
+                  "CIS4250", "CIS4360", "CIS4510", "CDA4101", "CEN4010", "CEN4801", "CEN3722",
+                  "CTS3348", "GEB3213"] },
+
+    { "id": "elective", "title": "Program Elective", "type": "chooseOne",
+      "options": [["CAI4002"], ["CAI4805"], ["CAP3744"], ["COP4709"], ["COP4834"],
+                  ["CET4860"], ["CET4861"], ["CET4862"], ["CET4884"]],
+      "note": "Select ONE elective (3 credits). Extra electives will not count toward this requirement." }
+  ],
+
+  "courses": {
+    "ENC1101":  { "title": "Introduction to Composition", "credits": 3, "level": "lower", "prereq": null, "notes": [] },
+    "MAC1105":  { "title": "College Algebra", "credits": 3, "level": "lower", "prereq": null, "notes": [] },
+    "MAC1114":  { "title": "College Trigonometry", "credits": 3, "level": "lower", "prereq": "MAC1105", "notes": [] },
+    "STA2023":  { "title": "Elementary Statistics", "credits": 3, "level": "lower", "prereq": "MAC1105", "notes": [] },
+    "EGN3443":  { "title": "Engineering Statistics", "credits": 3, "level": "lower", "prereq": { "or": ["MAC2311C", "EGN2045"] },
+                  "notes": [{ "author": "advisor", "text": "Recommended statistics option for BSIT." }] },
+    "EGN2045":  { "title": "Calculus for Engineering Technology", "credits": 3, "level": "lower", "prereq": "MAC1114", "notes": [] },
+    "MAC2311C": { "title": "Calculus with Analytic Geometry I", "credits": 5, "level": "lower", "prereq": "MAC1114", "notes": [] },
+    "COP1000":  { "title": "Introduction to Programming", "credits": 3, "level": "lower", "prereq": null, "notes": [] },
+    "COP2220":  { "title": "Programming in C", "credits": 3, "level": "lower", "prereq": "COP1000", "notes": [] },
+    "COP2360":  { "title": "C# Programming", "credits": 3, "level": "lower", "prereq": "COP1000", "notes": [] },
+    "COP2800":  { "title": "Java Programming", "credits": 3, "level": "lower", "prereq": "COP1000",
+                  "notes": [{ "author": "advisor", "text": "Students must select one of COP2220, COP2360 or COP2800, but do not need to take more than one." }] },
+    "CET3116":  { "title": "Digital Technology", "credits": 3, "level": "lower", "prereq": null,
+                  "notes": [{ "author": "advisor", "text": "Recommended digital technology option." }] },
+    "CET1112C": { "title": "Digital Circuits", "credits": 4, "level": "lower", "prereq": null, "notes": [] },
+    "COT3100":  { "title": "Discrete Structures", "credits": 3, "level": "lower", "prereq": "MAC1105",
+                  "notes": [{ "author": "advisor", "text": "Recommended discrete math option." }] },
+    "MAD2104":  { "title": "Discrete Mathematics", "credits": 3, "level": "lower", "prereq": "MAC1105", "notes": [] },
+    "EET3086":  { "title": "Electrical Fundamentals", "credits": 3, "level": "lower", "prereq": "MAC1114",
+                  "notes": [{ "author": "advisor", "text": "Recommended: completes the electrical requirement with one course." }] },
+    "EET3085":  { "title": "Survey of Electronics", "credits": 3, "level": "lower", "prereq": "MAC1114", "notes": [] },
+    "EET1011C": { "title": "Fundamentals of DC Circuits", "credits": 4, "level": "lower", "prereq": "MAC1105", "notes": [] },
+    "EET1021C": { "title": "Fundamentals of AC Circuits", "credits": 4, "level": "lower", "prereq": { "or": ["EET1011C", "EET3085"] }, "notes": [] },
+
+    "COP3530":  { "title": "Data Structures", "credits": 3, "level": "upper",
+                  "prereq": { "and": [ { "or": ["COP2220", "COP2360", "COP2800"] }, { "or": ["COT3100", "MAD2104"] } ] }, "notes": [] },
+    "COP4610":  { "title": "Operating Systems", "credits": 3, "level": "upper",
+                  "prereq": { "and": ["COP3530", { "or": ["CET3116", "CET1112C"] }] }, "notes": [] },
+    "COP4708":  { "title": "Applied Database I", "credits": 3, "level": "upper", "prereq": { "or": ["COP2220", "COP2360", "COP2800"] }, "notes": [] },
+    "COP4813":  { "title": "Web Systems I", "credits": 3, "level": "upper", "prereq": "COP4708", "notes": [] },
+    "CNT3104":  { "title": "Introduction to Telecommunications", "credits": 2, "level": "upper", "prereq": null, "notes": [] },
+    "CNT4007":  { "title": "Data and Computer Communications", "credits": 3, "level": "upper", "prereq": "CNT3104", "notes": [] },
+    "CNT4703":  { "title": "Voice and Data Network Design", "credits": 3, "level": "upper",
+                  "prereq": { "and": ["CNT4007", { "or": ["STA2023", "EGN3443"] }] }, "notes": [] },
+    "CIS4250":  { "title": "Ethical Issues in IT", "credits": 1, "level": "upper", "prereq": null, "notes": [] },
+    "CIS4360":  { "title": "Applied Cybersecurity", "credits": 3, "level": "upper", "prereq": "CNT4007", "notes": [] },
+    "CIS4510":  { "title": "IT Project Management", "credits": 3, "level": "upper", "prereq": "GEB3213", "notes": [] },
+    "CDA4101":  { "title": "Computer Organization and Design", "credits": 3, "level": "upper",
+                  "prereq": { "and": ["COP1000", { "or": ["CET3116", "CET1112C"] }] }, "notes": [] },
+    "CEN4010":  { "title": "Software Engineering", "credits": 3, "level": "upper", "prereq": "COP3530", "notes": [] },
+    "CEN4801":  { "title": "Systems Integration", "credits": 3, "level": "upper", "prereq": { "and": ["CNT4007", "COP4708"] }, "notes": [] },
+    "CEN3722":  { "title": "Human Computer Interfaces", "credits": 3, "level": "upper", "prereq": { "or": ["COP2800", "COP2220", "COP2360"] }, "notes": [] },
+    "CTS3348":  { "title": "Linux Administration", "credits": 3, "level": "upper", "prereq": "COP1000", "notes": [] },
+    "GEB3213":  { "title": "Business Writing", "credits": 3, "level": "upper", "prereq": "ENC1101", "notes": [] },
+
+    "CAI4002":  { "title": "Introduction to Artificial Intelligence", "credits": 3, "level": "upper",
+                  "prereq": { "and": ["COP3530", { "or": ["STA2023", "EGN3443"] }] }, "notes": [] },
+    "CAI4805":  { "title": "AI Implementation and Maintenance", "credits": 3, "level": "upper", "prereq": "CAI4002", "notes": [] },
+    "CAP3744":  { "title": "Data Analytics and Visualization", "credits": 3, "level": "upper", "prereq": { "or": ["STA2023", "EGN3443"] }, "notes": [] },
+    "COP4709":  { "title": "Applied Database II", "credits": 3, "level": "upper", "prereq": "COP4708", "notes": [] },
+    "COP4834":  { "title": "Web Systems II", "credits": 3, "level": "upper", "prereq": "COP4813", "notes": [] },
+    "CET4860":  { "title": "Introduction to Digital Forensics", "credits": 3, "level": "upper", "prereq": null, "notes": [] },
+    "CET4861":  { "title": "Advanced Digital Forensics", "credits": 3, "level": "upper", "prereq": "CET4860", "notes": [] },
+    "CET4862":  { "title": "Network Forensics and Incident Response", "credits": 3, "level": "upper", "prereq": { "and": ["CET4860", "CNT4007"] }, "notes": [] },
+    "CET4884":  { "title": "Security Methods and Practice", "credits": 3, "level": "upper", "prereq": "CIS4360", "notes": [] }
+  },
+
+  "defaultSemesters": ["Spring 2027", "Summer 2027", "Fall 2027"]
+}
+</script>
+
+<!-- ===================== APP ===================== -->
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Load JSON ----------
+  const DATA = JSON.parse(document.getElementById("programData").textContent);
+  const STORE_KEY = "bsitAdvisor_v1";
+
+  // Student record (separate from program data so it can be exported together)
+  let student = { completed: [], semesters: DATA.defaultSemesters.map(n => ({ name: n, courses: [] })) };
+
+  // Restore saved state (student record + student-added notes)
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (saved) {
+      student = saved.student || student;
+      Object.entries(saved.studentNotes || {}).forEach(([code, notes]) => {
+        if (DATA.courses[code]) DATA.courses[code].notes.push(...notes);
+      });
+    }
+  } catch (e) { /* storage unavailable – run in memory */ }
+
+  function save() {
+    try {
+      const studentNotes = {};
+      Object.entries(DATA.courses).forEach(([code, c]) => {
+        const mine = c.notes.filter(n => n.author === "student");
+        if (mine.length) studentNotes[code] = mine;
+      });
+      localStorage.setItem(STORE_KEY, JSON.stringify({ student, studentNotes }));
+    } catch (e) { /* ignore */ }
+  }
+
+  // ---------- UI state ----------
+  let filter = "all";
+  const openNotes = new Set();
+
+  // ---------- Helpers ----------
+  const $ = id => document.getElementById(id);
+  function el(tag, attrs, ...kids) {
+    const n = document.createElement(tag);
+    if (attrs) Object.entries(attrs).forEach(([k, v]) => {
+      if (k === "class") n.className = v;
+      else if (k === "text") n.textContent = v;
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
+    });
+    kids.flat().forEach(k => k != null && n.append(k));
+    return n;
+  }
+  function toast(msg, err) {
+    const t = $("toast");
+    t.textContent = msg; t.className = "show" + (err ? " err" : "");
+    clearTimeout(t._h); t._h = setTimeout(() => t.className = "", 2600);
+  }
+
+  // Map each course -> the choice group it belongs to
+  const groupOf = {};
+  DATA.groups.forEach(g => {
+    const codes = g.type === "all" ? g.courses : g.options.flat();
+    codes.forEach(c => groupOf[c] = g);
+  });
+
+  function plannedSem(code) { return student.semesters.findIndex(s => s.courses.includes(code)); }
+  function isCompleted(code) { return student.completed.includes(code); }
+
+  // Set of courses done by the start of semester index i (completed + earlier semesters)
+  function doneBefore(i) {
+    const s = new Set(student.completed);
+    for (let k = 0; k < i && k < student.semesters.length; k++) student.semesters[k].courses.forEach(c => s.add(c));
+    return s;
+  }
+  function allTakenOrPlanned() {
+    return doneBefore(student.semesters.length);
+  }
+
+  // Recursive AND / OR prerequisite evaluation
+  function prereqMet(expr, set) {
+    if (!expr) return true;
+    if (typeof expr === "string") return set.has(expr);
+    if (expr.and) return expr.and.every(e => prereqMet(e, set));
+    if (expr.or) return expr.or.some(e => prereqMet(e, set));
+    return true;
+  }
+  function missingList(expr, set) {
+    if (!expr || prereqMet(expr, set)) return [];
+    if (typeof expr === "string") return [expr];
+    if (expr.and) return expr.and.flatMap(e => missingList(e, set));
+    if (expr.or) return ["(" + expr.or.map(e => typeof e === "string" ? e : "…").join(" or ") + ")"];
+    return [];
+  }
+
+  // For a choose-one group: which option is satisfied (or started) by completed/planned courses
+  function satisfyingOption(g, set) {
+    if (g.type !== "chooseOne") return null;
+    return g.options.find(opt => opt.every(c => set.has(c))) || null;
+  }
+
+  // A course is "not needed" when its OR group is already satisfied by a different option
+  function notNeeded(code) {
+    const g = groupOf[code];
+    if (!g || g.type !== "chooseOne") return false;
+    if (isCompleted(code) || plannedSem(code) >= 0) return false;
+    const opt = satisfyingOption(g, allTakenOrPlanned());
+    return !!opt && !opt.includes(code);
+  }
+
+  function statusOf(code) {
+    if (isCompleted(code)) return "completed";
+    if (plannedSem(code) >= 0) return "planned";
+    if (notNeeded(code)) return "notneeded";
+    return prereqMet(DATA.courses[code].prereq, new Set(student.completed)) ? "available" : "locked";
+  }
+  const STATUS_TEXT = {
+    completed: "✓ Completed", planned: "Planned", available: "Can take now",
+    locked: "Locked – prerequisites needed", notneeded: "Not needed – requirement met"
+  };
+
+  // ---------- Actions ----------
+  function removeEverywhere(code) {
+    student.completed = student.completed.filter(c => c !== code);
+    student.semesters.forEach(s => s.courses = s.courses.filter(c => c !== code));
+  }
+
+  function markCompleted(code) {
+    if (notNeeded(code)) return toast(blockedMsg(code), true);
+    removeEverywhere(code);
+    student.completed.push(code);
+    commit(code + " marked completed");
+  }
+
+  function placeInSemester(code, i) {
+    if (notNeeded(code)) return toast(blockedMsg(code), true);
+    const before = doneBefore(i);
+    before.delete(code);
+    const pr = DATA.courses[code].prereq;
+    if (!prereqMet(pr, before)) {
+      return toast(`Can't plan ${code} in ${student.semesters[i].name}: needs ${missingList(pr, before).join(", ")} first.`, true);
+    }
+    removeEverywhere(code);
+    student.semesters[i].courses.push(code);
+    commit(`${code} added to ${student.semesters[i].name}`);
+  }
+
+  function unassign(code) { removeEverywhere(code); commit(code + " removed"); }
+
+  function blockedMsg(code) {
+    const g = groupOf[code];
+    const opt = satisfyingOption(g, allTakenOrPlanned());
+    return `${code} is not needed – "${g.title}" is already met by ${opt.join(" + ")}.`;
+  }
+
+  function addNote(code, text) {
+    text = text.trim();
+    if (!text) return;
+    DATA.courses[code].notes.push({ author: "student", text, date: new Date().toLocaleDateString() });
+    commit("Note added to " + code);
+  }
+  function deleteNote(code, idx) {
+    DATA.courses[code].notes.splice(idx, 1);
+    commit("Note removed");
+  }
+
+  function commit(msg) { save(); render(); if (msg) toast(msg); }
+
+  // ---------- Drag & drop ----------
+  let dragCode = null;
+  function makeDraggable(node, code) {
+    node.draggable = true;
+    node.addEventListener("dragstart", e => {
+      dragCode = code;
+      e.dataTransfer.setData("text/plain", code);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    node.addEventListener("dragend", () => dragCode = null);
+  }
+  function makeDropZone(node, onDrop, validate) {
+    node.addEventListener("dragover", e => {
+      e.preventDefault();
+      const ok = !validate || !dragCode || validate(dragCode);
+      node.classList.toggle("over", ok);
+      node.classList.toggle("bad", !ok);
+    });
+    node.addEventListener("dragleave", () => node.classList.remove("over", "bad"));
+    node.addEventListener("drop", e => {
+      e.preventDefault();
+      node.classList.remove("over", "bad");
+      const code = e.dataTransfer.getData("text/plain");
+      if (code && DATA.courses[code]) onDrop(code);
+    });
+  }
+
+  // ---------- Render: prerequisite text with met/unmet highlighting ----------
+  function renderExpr(expr, set, top) {
+    if (typeof expr === "string") return el("span", { class: "pr-code" + (set.has(expr) ? " met" : ""), text: expr });
+    const op = expr.and ? "AND" : "OR";
+    const parts = expr.and || expr.or;
+    const frag = el("span");
+    if (!top) frag.append("(");
+    parts.forEach((p, i) => {
+      if (i) frag.append(" ", el("span", { class: "pr-op", text: op }), " ");
+      frag.append(renderExpr(p, set, false));
+    });
+    if (!top) frag.append(")");
+    return frag;
+  }
+
+  // ---------- Render: one course card (dynamically generated) ----------
+  function courseCard(code) {
+    const c = DATA.courses[code];
+    const st = statusOf(code);
+    const card = el("div", { class: "card " + st, "data-code": code });
+    if (st !== "notneeded") makeDraggable(card, code);
+
+    card.append(
+      el("div", { class: "top" }, el("span", { class: "code", text: code }), el("span", { class: "credits", text: c.credits + " cr" })),
+      el("div", { class: "title", text: c.title }),
+      el("div", { class: "status " + st, text: STATUS_TEXT[st] + (st === "planned" ? " – " + student.semesters[plannedSem(code)].name : "") })
+    );
+
+    if (st === "notneeded") {
+      const opt = satisfyingOption(groupOf[code], allTakenOrPlanned());
+      card.append(el("div", { class: "prereq", text: "Requirement satisfied by " + opt.join(" + ") }));
+    } else if (c.prereq) {
+      card.append(el("div", { class: "prereq" }, "Prereq: ", renderExpr(c.prereq, new Set(student.completed), true)));
+    }
+
+    // Actions
+    const actions = el("div", { class: "actions" });
+    const chk = el("input", { type: "checkbox" });
+    chk.checked = st === "completed";
+    chk.disabled = st === "notneeded";
+    chk.addEventListener("change", () => chk.checked ? markCompleted(code) : unassign(code));
+    actions.append(el("label", null, chk, "Taken"));
+
+    if (st !== "completed" && st !== "notneeded") {
+      const sel = el("select", { title: "Add to plan" }, el("option", { value: "", text: "Plan in…" }));
+      student.semesters.forEach((s, i) => {
+        const o = el("option", { value: i, text: s.name });
+        if (plannedSem(code) === i) o.selected = true;
+        sel.append(o);
+      });
+      sel.addEventListener("change", () => sel.value === "" ? unassign(code) : placeInSemester(code, +sel.value));
+      actions.append(sel);
+    }
+
+    const nCount = c.notes.length;
+    const nb = el("button", {
+      class: "note-btn" + (nCount ? " has" : ""), title: "Notes",
+      text: "📝" + (nCount ? " " + nCount : ""),
+      onclick: () => { openNotes.has(code) ? openNotes.delete(code) : openNotes.add(code); render(); }
+    });
+    actions.append(nb);
+    card.append(actions);
+
+    if (openNotes.has(code)) card.append(notesPanel(code));
+    return card;
+  }
+
+  function notesPanel(code) {
+    const c = DATA.courses[code];
+    const box = el("div", { class: "notes" });
+    if (!c.notes.length) box.append(el("div", { class: "empty", text: "No notes yet." }));
+    c.notes.forEach((n, i) => {
+      const row = el("div", { class: "note " + n.author },
+        el("div", null, el("small", { text: n.author === "advisor" ? "Advisor note" : "My note" + (n.date ? " · " + n.date : "") }), n.text));
+      if (n.author === "student") row.append(el("button", { title: "Delete", text: "✕", onclick: () => deleteNote(code, i) }));
+      box.append(row);
+    });
+    const ta = el("textarea", { placeholder: "Add a note to " + code + "…" });
+    box.append(ta, el("button", { class: "primary", text: "Save note", onclick: () => addNote(code, ta.value) }));
+    return box;
+  }
+
+  function passesFilter(code) {
+    const st = statusOf(code);
+    if (filter === "all") return true;
+    if (filter === "available") return st === "available";
+    if (filter === "locked") return st === "locked";
+    if (filter === "done") return st === "completed" || st === "planned";
+    return true;
+  }
+
+  // ---------- Render: requirement groups ----------
+  function renderRequirements() {
+    const root = $("requirements");
+    root.replaceChildren();
+    const set = allTakenOrPlanned();
+
+    DATA.groups.forEach(g => {
+      const codes = g.type === "all" ? g.courses : g.options.flat().filter((c, i, a) => a.indexOf(c) === i);
+      const visible = codes.filter(passesFilter);
+      if (!visible.length) return;
+
+      let met, tagText;
+      if (g.type === "all") {
+        const n = g.courses.filter(c => set.has(c)).length;
+        met = n === g.courses.length;
+        tagText = `${n}/${g.courses.length} done or planned`;
+      } else {
+        const opt = satisfyingOption(g, set);
+        met = !!opt;
+        tagText = met ? "Met by " + opt.join(" + ") : "Choose one";
+      }
+
+      const sec = el("div", { class: "group" },
+        el("div", { class: "group-head" }, el("h3", { text: g.title }), el("span", { class: "tag" + (met ? " ok" : ""), text: tagText })));
+      if (g.note) sec.append(el("div", { class: "group-note", text: "ℹ " + g.note }));
+
+      if (g.type === "chooseOne" && g.options.some(o => o.length > 1)) {
+        g.options.forEach((opt, i) => {
+          const vis = opt.filter(passesFilter);
+          if (!vis.length) return;
+          sec.append(el("div", { class: "option-label", text: "Option " + (i + 1) + (opt.length > 1 ? " (" + opt.join(" AND ") + ")" : "") }));
+          sec.append(el("div", { class: "cards" }, vis.map(courseCard)));
+        });
+      } else {
+        sec.append(el("div", { class: "cards" }, visible.map(courseCard)));
+      }
+      root.append(sec);
+    });
+
+    if (!root.children.length) root.append(el("div", { class: "empty", text: "No courses match this filter." }));
+  }
+
+  // ---------- Render: plan (completed zone + semester zones) ----------
+  function chip(code, cls, warnText) {
+    const c = el("span", { class: "chip " + cls, title: warnText || DATA.courses[code].title },
+      el("b", { text: code }), (warnText ? "⚠ " : "") + DATA.courses[code].credits + " cr",
+      el("button", { title: "Remove", text: "✕", onclick: () => unassign(code) }));
+    makeDraggable(c, code);
+    return c;
+  }
+  function credits(list) { return list.reduce((s, c) => s + DATA.courses[c].credits, 0); }
+
+  function renderPlan() {
+    const root = $("planArea");
+    root.replaceChildren();
+
+    // Completed zone
+    const done = el("div", { class: "dropzone" },
+      el("div", { class: "zone-head" }, "Completed", el("span", { text: credits(student.completed) + " credits" })));
+    if (!student.completed.length) done.append(el("div", { class: "empty", text: "Drag courses you've already taken here." }));
+    student.completed.forEach(c => done.append(chip(c, "done")));
+    makeDropZone(done, markCompleted, code => !notNeeded(code));
+    root.append(done);
+
+    // Semester zones
+    student.semesters.forEach((s, i) => {
+      const z = el("div", { class: "dropzone" });
+      const rm = el("button", { text: "✕", title: "Remove semester", onclick: () => {
+        if (s.courses.length && !confirmRemove(s)) return;
+        student.semesters.splice(i, 1); commit(s.name + " removed");
+      } });
+      z.append(el("div", { class: "zone-head" }, s.name, el("span", null, credits(s.courses) + " credits ", rm)));
+      if (!s.courses.length) z.append(el("div", { class: "empty", text: "Drop courses for " + s.name + " here." }));
+      const before = doneBefore(i);
+      s.courses.forEach(c => {
+        const pr = DATA.courses[c].prereq;
+        const ok = prereqMet(pr, before);
+        z.append(chip(c, ok ? "" : "warn", ok ? null : "Prerequisite issue: needs " + missingList(pr, before).join(", ")));
+      });
+      makeDropZone(z, code => placeInSemester(code, i), code => {
+        const b = doneBefore(i); b.delete(code);
+        return !notNeeded(code) && prereqMet(DATA.courses[code].prereq, b);
+      });
+      root.append(z);
+    });
+  }
+  // Removing a semester with courses: just do it and tell the user (no blocking dialogs)
+  function confirmRemove(s) { toast(s.courses.length + " planned course(s) returned to the list"); return true; }
+
+  // ---------- Render: header + progress ----------
+  function renderHeader() {
+    const p = DATA.program;
+    $("progTitle").textContent = "Quick Advisor – " + p.name;
+    const sub = $("progSub");
+    sub.replaceChildren(`${p.school} · Catalog ${p.catalog} · Program code ${p.programCode} · `,
+      el("a", { href: p.catalogUrl, target: "_blank", rel: "noopener", text: "Program guide" }));
+    $("disclaimer").textContent = p.disclaimer;
+
+    const planned = student.semesters.flatMap(s => s.courses);
+    $("credDone").textContent = credits(student.completed);
+    $("credPlan").textContent = credits(planned);
+    const upper = credits(student.completed.filter(c => DATA.courses[c].level === "upper"));
+    $("upperDone").textContent = upper;
+    $("upperReq").textContent = p.upperDivisionCreditsRequired;
+    $("upperBar").style.width = Math.min(100, upper / p.upperDivisionCreditsRequired * 100) + "%";
+  }
+
+  function render() { renderHeader(); renderRequirements(); renderPlan(); }
+
+  // ---------- Static controls ----------
+  // Dropping a card back on the requirements panel removes it from plan/completed
+  makeDropZone($("requirements"), unassign);
+
+  $("filters").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    filter = b.dataset.f;
+    [...$("filters").children].forEach(x => x.classList.toggle("active", x === b));
+    renderRequirements();
+  });
+
+  $("btnAddSem").addEventListener("click", () => {
+    const last = student.semesters[student.semesters.length - 1];
+    let name = "Fall 2026";
+    if (last) {
+      const m = last.name.match(/(Spring|Summer|Fall) (\d{4})/);
+      if (m) {
+        const order = ["Spring", "Summer", "Fall"];
+        let t = order.indexOf(m[1]) + 1, y = +m[2];
+        if (t > 2) { t = 0; y++; }
+        name = order[t] + " " + y;
+      }
+    }
+    student.semesters.push({ name, courses: [] });
+    commit(name + " added");
+  });
+
+  $("btnReset").addEventListener("click", () => {
+    student = { completed: [], semesters: DATA.defaultSemesters.map(n => ({ name: n, courses: [] })) };
+    Object.values(DATA.courses).forEach(c => c.notes = c.notes.filter(n => n.author !== "student"));
+    openNotes.clear();
+    commit("Reset");
+  });
+
+  function exportObj() { return { ...DATA, student }; }
+  $("btnJson").addEventListener("click", () => {
+    $("jsonOut").textContent = JSON.stringify(exportObj(), null, 2);
+    $("jsonDlg").showModal();
+  });
+  $("btnClose").addEventListener("click", () => $("jsonDlg").close());
+  $("btnDownload").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(exportObj(), null, 2)], { type: "application/json" });
+    const a = el("a", { href: URL.createObjectURL(blob), download: "bsit-plan.json" });
+    document.body.append(a); a.click(); a.remove();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
