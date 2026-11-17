@@ -1,0 +1,117 @@
+[
+  {
+    "Name": "WordPress",
+    "Support": {
+      "items": ["Open Source (GPLv2)", "Community project, with commercial support from Automattic", "Supported by most hosting companies"],
+      "source": "https://wordpress.org/about/"
+    },
+    "Technology": {
+      "items": ["Server: PHP", "Database: MySQL or MariaDB", "Client: HTML, CSS, JavaScript (Block Editor built with React)"],
+      "source": "https://wordpress.org/about/requirements/"
+    },
+    "Capabilities": {
+      "items": ["Supports themes", "Supports plugins (60,000+ in the directory)", "Block editor for building pages", "Public REST API"],
+      "source": "https://developer.wordpress.org/rest-api/"
+    },
+    "Limitations": {
+      "items": ["Security risk from third-party plugins", "Needs frequent core, theme, and plugin updates", "Can slow down when many plugins are installed"],
+      "source": "https://developer.wordpress.org/advanced-administration/security/hardening/"
+    },
+    "Examples": [
+      { "name": "WordPress.org", "url": "https://wordpress.org/" },
+      { "name": "TechCrunch", "url": "https://techcrunch.com/" }
+    ]
+  },
+  {
+    "Name": "Drupal",
+    "Support": {
+      "items": ["Open Source (GPLv2)", "Supported by the Drupal Association and community", "Commercial support from companies like Acquia"],
+      "source": "https://www.drupal.org/about"
+    },
+    "Technology": {
+      "items": ["Server: PHP (built on Symfony components)", "Database: MySQL, MariaDB, PostgreSQL, or SQLite", "Client: HTML, CSS, JavaScript with Twig templates"],
+      "source": "https://www.drupal.org/docs/getting-started/system-requirements"
+    },
+    "Capabilities": {
+      "items": ["Supports themes and Twig templates", "Supports modules (plugins)", "Custom content types and fields", "Detailed user roles and permissions", "Built-in multilingual support", "REST and JSON:API for headless sites"],
+      "source": "https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module"
+    },
+    "Limitations": {
+      "items": ["Steep learning curve", "Usually needs a developer to build and maintain", "Major version upgrades can take a lot of work"],
+      "source": "https://www.drupal.org/docs/upgrading-drupal"
+    },
+    "Examples": [
+      { "name": "European Commission (europa.eu)", "url": "https://commission.europa.eu/" },
+      { "name": "Drupal.org", "url": "https://www.drupal.org/" }
+    ]
+  },
+  {
+    "Name": "Joomla",
+    "Support": {
+      "items": ["Open Source (GPLv2)", "Supported by Open Source Matters and the volunteer community"],
+      "source": "https://www.joomla.org/about-joomla.html"
+    },
+    "Technology": {
+      "items": ["Server: PHP", "Database: MySQL, MariaDB, or PostgreSQL", "Client: HTML, CSS, JavaScript (Bootstrap-based templates)"],
+      "source": "https://manual.joomla.org/docs/next/get-started/technical-requirements/"
+    },
+    "Capabilities": {
+      "items": ["Supports templates", "Supports extensions (components, modules, plugins)", "Built-in multilingual support", "Access control lists for users", "Web services API"],
+      "source": "https://extensions.joomla.org/"
+    },
+    "Limitations": {
+      "items": ["Smaller extension library than WordPress", "Admin panel is harder for beginners", "Smaller community and fewer hosting one-click options"],
+      "source": "https://w3techs.com/technologies/overview/content_management"
+    },
+    "Examples": [
+      { "name": "Joomla.org", "url": "https://www.joomla.org/" },
+      { "name": "Joomla Showcase Directory", "url": "https://showcase.joomla.org/" }
+    ]
+  },
+  {
+    "Name": "Shopify",
+    "Support": {
+      "items": ["Proprietary / commercial", "Sold and hosted by Shopify Inc. (paid monthly plans)"],
+      "source": "https://www.shopify.com/pricing"
+    },
+    "Technology": {
+      "items": ["Server: Ruby on Rails (hosted SaaS)", "Database: MySQL (managed by Shopify)", "Client: HTML, CSS, JavaScript with Liquid templates"],
+      "source": "https://shopify.dev/docs/api/liquid"
+    },
+    "Capabilities": {
+      "items": ["Supports themes", "Supports apps from the Shopify App Store", "Built-in payments, inventory, and checkout", "Hosting and security handled by Shopify", "Storefront and Admin APIs"],
+      "source": "https://shopify.dev/docs/api"
+    },
+    "Limitations": {
+      "items": ["Monthly fees plus transaction fees on outside payment gateways", "No access to server code", "Mainly built for e-commerce, limited for other site types", "Many features require paid apps"],
+      "source": "https://help.shopify.com/en/manual/payments/third-party-payments"
+    },
+    "Examples": [
+      { "name": "Allbirds", "url": "https://www.allbirds.com/" },
+      { "name": "Gymshark", "url": "https://www.gymshark.com/" }
+    ]
+  },
+  {
+    "Name": "Ghost",
+    "Support": {
+      "items": ["Open Source (MIT license)", "Run by the Ghost Foundation (non-profit)", "Paid hosting available through Ghost(Pro)"],
+      "source": "https://ghost.org/about/"
+    },
+    "Technology": {
+      "items": ["Server: Node.js", "Database: MySQL 8 (SQLite for development)", "Client: HTML, CSS, JavaScript with Handlebars themes"],
+      "source": "https://ghost.org/docs/hosting/"
+    },
+    "Capabilities": {
+      "items": ["Supports Handlebars themes", "Built-in newsletters and paid memberships", "Built-in SEO tools", "Content API and Admin API for headless use", "Fast page loads"],
+      "source": "https://ghost.org/docs/content-api/"
+    },
+    "Limitations": {
+      "items": ["Made mainly for blogs and publishing", "No plugin system like WordPress (uses integrations instead)", "Self-hosting requires Node.js server knowledge"],
+      "source": "https://ghost.org/integrations/"
+    },
+    "Examples": [
+      { "name": "Platformer", "url": "https://www.platformer.news/" },
+      { "name": "Ghost Explore (showcase)", "url": "https://ghost.org/explore/" }
+    ]
+  }
+]

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignment 12 - CMS Comparison</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { font-size: 24px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #999; padding: 8px; vertical-align: top; text-align: left; }
+    th { background: #ddd; }
+    ul { margin: 0; padding-left: 18px; }
+    .source { font-size: 12px; display: block; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <p><a href="index.html">&larr; Back to home</a></p>
+  <h1>Assignment 12 - Content Management Systems Comparison</h1>
+  <p>Data is loaded from <a href="cms.json">cms.json</a>.</p>
+
+  <table id="cmsTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Support</th>
+        <th>Technology</th>
+        <th>Capabilities</th>
+        <th>Limitations</th>
+        <th>Examples</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    // Build a bullet list with a source link from one category object
+    function makeCell(category) {
+      var td = document.createElement("td");
+      var ul = document.createElement("ul");
+      category.items.forEach(function (item) {
+        var li = document.createElement("li");
+        li.textContent = item;
+        ul.appendChild(li);
+      });
+      td.appendChild(ul);
+
+      if (category.source) {
+        var a = document.createElement("a");
+        a.href = category.source;
+        a.textContent = "Source";
+        a.target = "_blank";
+        a.className = "source";
+        td.appendChild(a);
+      }
+      return td;
+    }
+
+    // Build the example sites cell
+    function makeExamples(examples) {
+      var td = document.createElement("td");
+      var ul = document.createElement("ul");
+      examples.forEach(function (ex) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = ex.url;
+        a.textContent = ex.name;
+        a.target = "_blank";
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      td.appendChild(ul);
+      return td;
+    }
+
+    // Load the external JSON file and fill the table
+    fetch("cms.json")
+      .then(function (response) { return response.json(); })
+      .then(function (data) {
+        var tbody = document.querySelector("#cmsTable tbody");
+        data.forEach(function (cms) {
+          var tr = document.createElement("tr");
+
+          var nameCell = document.createElement("td");
+          nameCell.innerHTML = "<strong></strong>";
+          nameCell.firstChild.textContent = cms.Name;
+          tr.appendChild(nameCell);
+
+          tr.appendChild(makeCell(cms.Support));
+          tr.appendChild(makeCell(cms.Technology));
+          tr.appendChild(makeCell(cms.Capabilities));
+          tr.appendChild(makeCell(cms.Limitations));
+          tr.appendChild(makeExamples(cms.Examples));
+
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(function (error) {
+        document.querySelector("#cmsTable tbody").innerHTML =
+          "<tr><td colspan='6'>Could not load cms.json: " + error + "</td></tr>";
+      });
+  </script>
+</body>
+</html>
