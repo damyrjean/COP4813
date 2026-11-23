@@ -91,7 +91,7 @@ td:first-child{text-align:right;font-weight:600;width:60px;color:var(--teal)}
  <header>
   <h1>Port <span>Patrol</span></h1>
   <div class="hud">
-   <div>Level<b id="hLvl">1/3</b></div>
+   <div>Level<b id="hLvl">1/5</b></div>
    <div>Packet<b id="hPkt">0/8</b></div>
    <div>Score<b id="hScore">0</b></div>
    <div>Streak<b id="hStreak">0</b></div>
@@ -125,12 +125,14 @@ td:first-child{text-align:right;font-weight:600;width:60px;color:var(--teal)}
 
 <script>
 {
-const PORTS={21:['FTP','file transfer'],22:['SSH','secure remote login'],23:['Telnet','unencrypted remote login'],25:['SMTP','sending email'],53:['DNS','turning names into IP addresses'],80:['HTTP','unencrypted web pages'],110:['POP3','downloading email'],143:['IMAP','syncing email'],443:['HTTPS','encrypted web pages'],445:['SMB','Windows file sharing'],3306:['MySQL','database access'],3389:['RDP','Windows remote desktop']};
+const PORTS={21:['FTP','file transfer'],22:['SSH','secure remote login'],23:['Telnet','unencrypted remote login'],25:['SMTP','sending email'],53:['DNS','turning names into IP addresses'],80:['HTTP','unencrypted web pages'],110:['POP3','downloading email'],143:['IMAP','syncing email'],443:['HTTPS','encrypted web pages'],123:['NTP','syncing device clocks'],161:['SNMP','monitoring network devices'],445:['SMB','Windows file sharing'],514:['Syslog','sending security logs'],636:['LDAPS','secure directory sign-in'],3306:['MySQL','database access'],3389:['RDP','Windows remote desktop']};
 const ALL=Object.keys(PORTS).map(Number);
 const LEVELS=[
  {name:'Web server',allow:[80,443,53],time:7000,showName:true,rulePorts:true,note:'Training mode: packets show the port number and the service name.'},
  {name:'Mail server',allow:[25,110,143,53],time:6000,showName:false,rulePorts:true,note:'Packets now show only the port number. Match it to the rule list.'},
- {name:'Admin jump box',allow:[22,3389,443],time:4500,showName:false,rulePorts:false,note:'Expert mode: rules list service names only, and packets move faster.'}];
+ {name:'Admin jump box',allow:[22,3389,443],time:4500,showName:false,rulePorts:false,note:'Expert mode: rules list service names only, and packets move faster.'},
+ {name:'USPS scanner network',allow:[443,53,123],time:5000,showName:false,rulePorts:true,note:'Handheld delivery scanners upload package scans over HTTPS, look up servers with DNS, and use NTP so every scan gets the right time stamp.'},
+ {name:'Military base operations',allow:[22,443,636,514],time:4000,showName:false,rulePorts:false,note:'Locked-down network: secure admin access, secure web, secure sign-in, and logs sent to the security team. Fastest packets yet.'}];
 const PER=8,MAXSH=5;
 const $=id=>document.getElementById(id);
 const lane=$('lane'),pkt=$('pkt'),bar=$('bar'),fb=$('fb'),ov=$('ov'),card=$('card'),wall=$('wall');
@@ -142,7 +144,7 @@ function overlay(html,go){card.innerHTML=html;ov.hidden=false;onGo=go;const b=ca
 ov.addEventListener('click',e=>{if(e.target.closest('.go')&&onGo){ov.hidden=true;const f=onGo;onGo=null;f()}});
 
 function hud(){
- $('hLvl').textContent=(S.lvl+1)+'/3';$('hPkt').textContent=S.idx+'/'+PER;
+ $('hLvl').textContent=(S.lvl+1)+'/'+LEVELS.length;$('hPkt').textContent=S.idx+'/'+PER;
  $('hScore').textContent=S.score;$('hStreak').textContent=S.streak;
  $('hSh').innerHTML=Array.from({length:MAXSH},(_,i)=>`<i class="${i<S.shields?'':'off'}"></i>`).join('');
 }
@@ -236,7 +238,7 @@ overlay(`<h2>Port Patrol</h2>
 <li>Decide before the packet hits the firewall, or it counts as a miss.</li>
 <li>Every wrong call or miss costs a shield. Lose all 5 and the network is breached.</li>
 </ol>
-<p><b>Scoring:</b> 10 points per correct call, up to 5 bonus points for speed, and up to 10 more for a streak. Clear 3 levels (8 packets each) to finish your shift. Your accuracy decides your rank.</p>
+<p><b>Scoring:</b> 10 points per correct call, up to 5 bonus points for speed, and up to 10 more for a streak. Clear all 5 levels (8 packets each): web server, mail server, admin jump box, USPS scanner network and military base operations to finish your shift. Your accuracy decides your rank.</p>
 <details><summary>Study the port cheat sheet first</summary><table><tr><th>Port</th><th>Service</th><th>Used for</th></tr>${ref}</table></details>
 <button class="go">Start shift</button>`,startGame);
 }
