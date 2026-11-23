@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assignment 13 - Port Patrol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: arcade-meets-network-ops, quick and clear, teaches while you play
+   IDEA: a firewall console; packets travel a wire from the Internet toward your server
+   PICTURE: the packet lane itself, cloud on the left, brick firewall and server rack on the right
+   COLOUR and TYPE: deep server-room teal, signal teal for allow, brick coral for block; Chakra Petch + IBM Plex Sans
+   LAYOUT: HUD strip, rule card, lane, two big decision buttons, feedback line; overlays for start, level, results */
+:root{color-scheme:dark;--bg:#0b2226;--panel:#12333a;--line:#1f4a52;--ink:#e8f1ee;--muted:#9fbab4;--teal:#3fc1a5;--coral:#ff6a48;--brick:#b8432c}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif;overflow-x:clip}
+h1,h2,.num,.btn,.hud b{font-family:"Chakra Petch","IBM Plex Sans",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:20px max(4vw,14px) 32px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.05;margin:0;letter-spacing:.5px}
+h1 span{color:var(--teal)}
+.hud{display:flex;flex-wrap:wrap;gap:8px}
+.hud div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:13px;color:var(--muted)}
+.hud b{display:block;color:var(--ink);font-size:20px;line-height:1.1}
+.shields{display:flex;gap:4px;margin-top:4px}
+.shields i{width:14px;height:14px;border-radius:3px;background:var(--teal)}
+.shields i.off{background:#2b4a50}
+.rule{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.rule .lbl{font-size:13px;color:var(--muted)}
+.rule h2{margin:0;font-size:20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(63,193,165,.15);color:var(--teal);border:1px solid rgba(63,193,165,.5);border-radius:999px;padding:3px 12px;font-weight:600;font-size:15px;white-space:nowrap}
+.rule .note{flex-basis:100%;font-size:14px;color:var(--muted);margin:0}
+.lane{position:relative;height:240px;border-radius:16px;overflow:hidden;background:
+ linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.15)),
+ repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.035) 46px 48px),var(--panel);border:1px solid var(--line)}
+.wire{position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;background:linear-gradient(90deg,#2c5c64,#3fc1a5 60%,#2c5c64)}
+.cloud{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:96px}
+.cloud span,.srv span{display:block;text-align:center;font-size:12px;color:var(--muted);margin-top:2px}
+.wall{position:absolute;top:0;bottom:0;right:92px;width:40px;background:
+ repeating-linear-gradient(0deg,#6e2618 0 2px,transparent 2px 22px),
+ repeating-linear-gradient(90deg,var(--brick) 0 18px,#6e2618 18px 20px);box-shadow:-6px 0 18px rgba(255,106,72,.25)}
+.wall.flash{animation:fl .45s}
+@keyframes fl{50%{box-shadow:-6px 0 40px rgba(255,106,72,.9)}}
+.wall-l{position:absolute;right:82px;bottom:8px;font-size:12px;color:var(--muted);width:60px;text-align:center}
+.srv{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:62px}
+.srv i{display:block;height:16px;margin:4px 0;border-radius:3px;background:#1b3f46;border:1px solid #3a6a72;position:relative}
+.srv i::after{content:"";position:absolute;right:6px;top:5px;width:5px;height:5px;border-radius:50%;background:var(--teal)}
+.pkt{position:absolute;left:0;top:50%;width:118px;height:88px;margin-top:-44px;border-radius:12px;background:var(--ink);color:#0b2226;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.4);will-change:transform;visibility:hidden}
+.pkt::before{content:"";position:absolute;inset:6px 6px auto;height:6px;border-radius:3px;background:#c9d9d4}
+.pkt .num{font-size:32px;font-weight:700;line-height:1}
+.pkt small{font-size:13px;font-weight:600;color:#36575c}
+.pkt.ok{background:var(--teal)}
+.pkt.bad{background:var(--coral);color:#fff}.pkt.bad small{color:#fff}
+.pkt.drop{animation:drop .9s forwards}
+@keyframes drop{to{opacity:0;margin-top:40px}}
+.bar{position:absolute;left:0;bottom:0;height:5px;background:var(--teal);width:100%}
+.ctrl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:14px}
+.btn{font-size:22px;font-weight:700;border:0;border-radius:14px;min-height:64px;cursor:pointer;color:#0b2226;transition:transform .08s}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible,.go:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.btn kbd{font:600 13px "IBM Plex Sans",sans-serif;opacity:.75;display:block}
+.allow{background:var(--teal)}.block{background:var(--coral);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.fb{min-height:52px;margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--panel);border-left:4px solid var(--line);font-size:16px}
+.fb.good{border-color:var(--teal)}.fb.err{border-color:var(--coral)}
+.ov{position:fixed;inset:0;background:rgba(5,18,20,.86);display:flex;align-items:center;justify-content:center;padding:16px;z-index:5}
+.ov[hidden]{display:none}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:620px;width:100%;max-height:92vh;overflow:auto;padding:24px}
+.card h2{font-size:30px;line-height:1.1;margin:0 0 8px}
+.card p,.card li{color:#cfe0dc}
+.card ol{padding-left:22px}
+.go{font:700 20px "Chakra Petch",sans-serif;background:var(--teal);color:#0b2226;border:0;border-radius:12px;min-height:52px;padding:0 28px;cursor:pointer;margin-top:10px}
+details{margin-top:10px}summary{cursor:pointer;color:var(--teal);font-weight:600;min-height:32px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+td:first-child{text-align:right;font-weight:600;width:60px;color:var(--teal)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:14px 0}
+.stats div{background:var(--bg);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--muted)}
+.stats b{display:block;font:700 26px "Chakra Petch",sans-serif;color:var(--ink)}
+.rank{font:700 20px "Chakra Petch",sans-serif;color:var(--teal)}
+@media(max-width:600px){.lane{height:200px}.pkt{width:92px;height:76px;margin-top:-38px}.pkt .num{font-size:26px}.cloud{width:70px}.wall{right:76px;width:30px}.wall-l{right:62px}.srv{width:50px;right:10px}.hud div{padding:5px 9px}.hud b{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.pkt.drop,.wall.flash{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <p style="margin:0 0 10px"><a href="index.html" style="color:var(--teal)">&larr; Back to home</a></p>
+ <header>
+  <h1>Port <span>Patrol</span></h1>
+  <div class="hud">
+   <div>Level<b id="hLvl">1/3</b></div>
+   <div>Packet<b id="hPkt">0/8</b></div>
+   <div>Score<b id="hScore">0</b></div>
+   <div>Streak<b id="hStreak">0</b></div>
+   <div>Shields<span class="shields" id="hSh"></span></div>
+  </div>
+ </header>
+
+ <section class="rule">
+  <div><div class="lbl">Protecting</div><h2 id="rName">Web server</h2></div>
+  <div><div class="lbl">Allowed traffic</div><div class="chips" id="rChips"></div></div>
+  <p class="note" id="rNote"></p>
+ </section>
+
+ <section class="lane" id="lane" aria-label="Packet lane">
+  <div class="wire"></div>
+  <div class="cloud"><svg viewBox="0 0 96 60" width="100%"><path d="M24 52h52a16 16 0 0 0 0-32 22 22 0 0 0-42-6A18 18 0 0 0 24 52z" fill="#1f4a52" stroke="#3a6a72" stroke-width="2"/></svg><span>Internet</span></div>
+  <div class="wall" id="wall"></div><div class="wall-l">Firewall</div>
+  <div class="srv"><i></i><i></i><i></i><i></i><span>Server</span></div>
+  <div class="pkt" id="pkt"><span class="num" id="pNum">443</span><small id="pName">HTTPS</small></div>
+  <div class="bar" id="bar"></div>
+ </section>
+
+ <div class="ctrl">
+  <button class="btn allow" id="bAllow" disabled>ALLOW<kbd>A key</kbd></button>
+  <button class="btn block" id="bBlock" disabled>BLOCK<kbd>B key</kbd></button>
+ </div>
+ <div class="fb" id="fb" aria-live="polite">Press Start to begin your shift.</div>
+</div>
+
+<div class="ov" id="ov"><div class="card" id="card"></div></div>
+
+<script>
+{
+const PORTS={21:['FTP','file transfer'],22:['SSH','secure remote login'],23:['Telnet','unencrypted remote login'],25:['SMTP','sending email'],53:['DNS','turning names into IP addresses'],80:['HTTP','unencrypted web pages'],110:['POP3','downloading email'],143:['IMAP','syncing email'],443:['HTTPS','encrypted web pages'],445:['SMB','Windows file sharing'],3306:['MySQL','database access'],3389:['RDP','Windows remote desktop']};
+const ALL=Object.keys(PORTS).map(Number);
+const LEVELS=[
+ {name:'Web server',allow:[80,443,53],time:7000,showName:true,rulePorts:true,note:'Training mode: packets show the port number and the service name.'},
+ {name:'Mail server',allow:[25,110,143,53],time:6000,showName:false,rulePorts:true,note:'Packets now show only the port number. Match it to the rule list.'},
+ {name:'Admin jump box',allow:[22,3389,443],time:4500,showName:false,rulePorts:false,note:'Expert mode: rules list service names only, and packets move faster.'}];
+const PER=8,MAXSH=5;
+const $=id=>document.getElementById(id);
+const lane=$('lane'),pkt=$('pkt'),bar=$('bar'),fb=$('fb'),ov=$('ov'),card=$('card'),wall=$('wall');
+let S={},raf=0,onGo=null;
+
+const ref=ALL.map(p=>`<tr><td>${p}</td><td>${PORTS[p][0]}</td><td>${PORTS[p][1]}</td></tr>`).join('');
+
+function overlay(html,go){card.innerHTML=html;ov.hidden=false;onGo=go;const b=card.querySelector('.go');if(b)b.focus()}
+ov.addEventListener('click',e=>{if(e.target.closest('.go')&&onGo){ov.hidden=true;const f=onGo;onGo=null;f()}});
+
+function hud(){
+ $('hLvl').textContent=(S.lvl+1)+'/3';$('hPkt').textContent=S.idx+'/'+PER;
+ $('hScore').textContent=S.score;$('hStreak').textContent=S.streak;
+ $('hSh').innerHTML=Array.from({length:MAXSH},(_,i)=>`<i class="${i<S.shields?'':'off'}"></i>`).join('');
+}
+function rules(){
+ const L=LEVELS[S.lvl];$('rName').textContent=L.name;$('rNote').textContent=L.note;
+ $('rChips').innerHTML=L.allow.map(p=>`<span class="chip">${PORTS[p][0]}${L.rulePorts?' · '+p:''}</span>`).join('');
+}
+function startGame(){
+ S={lvl:0,idx:0,score:0,streak:0,best:0,shields:MAXSH,right:0,total:0,missed:{},cur:0,last:0,active:false};
+ hud();levelIntro();
+}
+function levelIntro(){
+ const L=LEVELS[S.lvl];rules();hud();
+ overlay(`<h2>Level ${S.lvl+1}: ${L.name}</h2><p>Only let these services through:</p>
+ <div class="chips">${L.allow.map(p=>`<span class="chip">${PORTS[p][0]} · ${p}</span>`).join('')}</div>
+ <p>${L.note} You have ${L.time/1000} seconds per packet.</p><button class="go">Start level</button>`,()=>{S.idx=0;hud();next()});
+}
+function pick(){
+ const L=LEVELS[S.lvl];const pool=Math.random()<.5?L.allow:ALL.filter(p=>!L.allow.includes(p));
+ let p;do{p=pool[Math.floor(Math.random()*pool.length)]}while(p===S.last&&pool.length>1);
+ return S.last=p;
+}
+function next(){
+ if(S.idx>=PER){S.lvl++;if(S.lvl>=LEVELS.length)return end(true);return levelIntro()}
+ const L=LEVELS[S.lvl];S.cur=pick();S.idx++;hud();
+ $('pNum').textContent=S.cur;$('pName').textContent=L.showName?PORTS[S.cur][0]:'port';
+ pkt.className='pkt';pkt.style.visibility='visible';
+ fb.className='fb';fb.textContent='Incoming packet on port '+S.cur+'. Allow or block?';
+ S.t0=performance.now();S.active=true;btns(true);raf=requestAnimationFrame(tick);
+}
+function travel(){return lane.clientWidth-wall.offsetWidth-parseFloat(getComputedStyle(wall).right)-pkt.offsetWidth-8}
+function tick(now){
+ if(!S.active)return;
+ const L=LEVELS[S.lvl],t=Math.min((now-S.t0)/L.time,1);
+ pkt.style.transform=`translateX(${t*travel()}px)`;
+ bar.style.width=((1-t)*100)+'%';bar.style.background=t>.7?'var(--coral)':'var(--teal)';
+ if(t>=1)return judge(null);
+ raf=requestAnimationFrame(tick);
+}
+function btns(on){$('bAllow').disabled=!on;$('bBlock').disabled=!on}
+function judge(allow){
+ if(!S.active)return;S.active=false;cancelAnimationFrame(raf);btns(false);
+ const L=LEVELS[S.lvl],p=S.cur,should=L.allow.includes(p),[nm,what]=PORTS[p];
+ const prog=Math.min((performance.now()-S.t0)/L.time,1);
+ S.total++;
+ $('pName').textContent=nm;
+ if(allow===should){
+  S.right++;S.streak++;S.best=Math.max(S.best,S.streak);
+  const pts=10+Math.round(5*(1-prog))+Math.min(S.streak,5)*2;S.score+=pts;
+  pkt.classList.add('ok');fb.className='fb good';
+  fb.textContent=`Correct, +${pts}. Port ${p} is ${nm} (${what}), so it ${should?'gets through':'gets blocked'}.`;
+ }else{
+  S.streak=0;S.shields--;S.missed[p]=(S.missed[p]||0)+1;
+  pkt.classList.add('bad');wall.classList.remove('flash');void wall.offsetWidth;wall.classList.add('flash');
+  fb.className='fb err';
+  fb.textContent=allow===null?`Too slow! Port ${p} (${nm}) hit the firewall unchecked. It should be ${should?'allowed':'blocked'}.`
+   :`Shield lost. Port ${p} is ${nm} (${what}) and should be ${should?'allowed':'blocked'} on the ${L.name.toLowerCase()}.`;
+ }
+ pkt.classList.add('drop');hud();
+ setTimeout(()=>{pkt.style.visibility='hidden';S.shields<=0?end(false):next()},1500);
+}
+function end(win){
+ btns(false);const acc=S.total?Math.round(S.right/S.total*100):0;
+ let hi=0;try{hi=+localStorage.getItem('portPatrolHi')||0;if(S.score>hi)localStorage.setItem('portPatrolHi',S.score)}catch(e){}
+ const newHi=S.score>hi;
+ const rank=acc>=90?'Senior Network Admin':acc>=75?'Firewall Engineer':acc>=50?'Help Desk Hero':'Intern: time to review your ports';
+ const miss=Object.keys(S.missed);
+ overlay(`<h2>${win?'Shift complete!':'Network breached!'}</h2>
+ <p class="rank">Rank: ${rank}</p>
+ <div class="stats"><div>Score<b>${S.score}</b></div><div>Accuracy<b>${acc}%</b></div><div>Best streak<b>${S.best}</b></div><div>${newHi?'New high score':'High score'}<b>${Math.max(hi,S.score)}</b></div></div>
+ ${miss.length?`<p>Ports to review:</p><table>${miss.map(p=>`<tr><td>${p}</td><td>${PORTS[p][0]}</td><td>${PORTS[p][1]}</td></tr>`).join('')}</table>`:'<p>Perfect: you missed nothing.</p>'}
+ <button class="go">Play again</button>`,startGame);
+ fb.className='fb';fb.textContent=win?'Shift over. Your server made it through.':'Game over. Too many bad packets got through.';
+}
+document.addEventListener('keydown',e=>{
+ if(!ov.hidden){if((e.key==='Enter'||e.key===' ')&&onGo){e.preventDefault();card.querySelector('.go').click()}return}
+ const k=e.key.toLowerCase();
+ if(k==='a'||e.key==='ArrowLeft')judge(true);
+ else if(k==='b'||e.key==='ArrowRight')judge(false);
+});
+$('bAllow').addEventListener('click',()=>judge(true));
+$('bBlock').addEventListener('click',()=>judge(false));
+
+S={lvl:0,idx:0,score:0,streak:0,shields:MAXSH};hud();rules();
+overlay(`<h2>Port Patrol</h2>
+<p>You are the firewall. Data packets fly in from the Internet, each one stamped with a port number. Your job is to let the right traffic reach your server and stop everything else.</p>
+<p><b>How to play</b></p>
+<ol>
+<li>Read the <b>Allowed traffic</b> list for the server you are protecting.</li>
+<li>When a packet appears, press <b>ALLOW</b> (A key) if its port is on the list, or <b>BLOCK</b> (B key) if it is not.</li>
+<li>Decide before the packet hits the firewall, or it counts as a miss.</li>
+<li>Every wrong call or miss costs a shield. Lose all 5 and the network is breached.</li>
+</ol>
+<p><b>Scoring:</b> 10 points per correct call, up to 5 bonus points for speed, and up to 10 more for a streak. Clear 3 levels (8 packets each) to finish your shift. Your accuracy decides your rank.</p>
+<details><summary>Study the port cheat sheet first</summary><table><tr><th>Port</th><th>Service</th><th>Used for</th></tr>${ref}</table></details>
+<button class="go">Start shift</button>`,startGame);
+}
+</script>
+</body>
+</html>
